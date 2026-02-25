@@ -683,36 +683,35 @@
     /* ══════════════════════════════════════════
        MODAL (glass)
     ══════════════════════════════════════════ */
-    .modal-backdrop {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.50); z-index: 200;
-      backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-      animation: fadeIn 0.2s ease;
-    }
-    .modal-backdrop.active { display: block; }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
+    /* ── Modal Overlay (flex-center, no transform hacks) ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .modal-overlay.active { display: flex; }
+
     .modal {
-      display: none; position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-48%) scale(0.93);
-      width: 92%; max-width: 600px; max-height: 88vh;
-      z-index: 201;
+      position: relative;
+      width: 100%; max-width: 640px;
+      max-height: min(88vh, 740px);
       border-radius: var(--radius-xl);
       background: var(--glass-modal);
       backdrop-filter: blur(var(--blur-modal));
       -webkit-backdrop-filter: blur(var(--blur-modal));
       border: 1px solid var(--glass-border);
       box-shadow: var(--sh-modal);
-      overflow: hidden; flex-direction: column;
-      opacity: 0;
-      transition: transform 0.30s cubic-bezier(.22,1,.36,1), opacity 0.22s ease;
+      overflow: hidden; display: flex; flex-direction: column;
+      will-change: transform, opacity;
     }
-    .modal.active { display: flex; transform: translate(-50%,-50%) scale(1); opacity: 1; }
     .modal::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),0.7) 35%, rgba(56,189,248,0.6) 65%, transparent);
-      pointer-events: none;
+      pointer-events: none; z-index: 1;
     }
 
     .modal-header {
@@ -744,7 +743,7 @@
     .modal-body::-webkit-scrollbar { width: 4px; }
     .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
     .modal-section { margin-bottom: 20px; }
-    .modal-desc { font-size: 13px; color: var(--text-muted); line-height: 1.72; transition: color 0.3s; }
+    .modal-desc { font-size: 14px; color: var(--text); line-height: 1.75; transition: color 0.3s; opacity: 0.88; }
     .modal-avg {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 12px; color: var(--text-muted);
@@ -763,6 +762,30 @@
     .star-btn:hover { transform: scale(1.25) rotate(-5deg); }
     .star-btn.filled { color: #fbbf24; }
 
+    /* Visit CTA in modal footer */
+    .modal-visit-link { text-decoration: none; }
+    .modal-visit-btn {
+      background: var(--accent) !important;
+      color: #fff !important;
+      border-color: transparent !important;
+      padding: 9px 22px !important;
+      font-weight: 600 !important;
+    }
+    .modal-visit-btn:hover {
+      background: rgba(var(--accent-rgb), 0.82) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Modal footer responsive */
+    @media (max-width: 500px) {
+      .modal-footer { flex-direction: column; align-items: stretch; }
+      .modal-visit-link { width: 100%; }
+      .modal-visit-btn { width: 100%; justify-content: center; text-align: center; }
+      .modal-footer { padding: 12px 16px; }
+      .modal-header { padding: 16px; }
+      .modal-body { padding: 16px; }
+    }
+
     /* WIN95 modal overrides */
     [data-theme="win95"] .modal {
       border-radius: 0 !important;
@@ -773,7 +796,8 @@
       box-shadow: 4px 4px 0 #000 !important;
     }
     [data-theme="win95"] .modal::before { display: none !important; }
-    [data-theme="win95"] .modal-backdrop { backdrop-filter: none !important; }
+    [data-theme="win95"] .modal-overlay { backdrop-filter: none !important; background: rgba(0,0,0,0.4) !important; }
+    [data-theme="win95"] * { cursor: auto !important; }
     [data-theme="win95"] .modal-header {
       background: linear-gradient(90deg, #000080, #1084d0) !important;
       border-bottom: 2px solid #808080 !important;
@@ -1033,14 +1057,10 @@
     .list-row, .kanban-col, .timeline-item,
     table.table-view tbody tr {
       opacity: 0;
+      /* Failsafe: auto-show after 1.5s if Motion fails to load */
+      animation: motionFallback 0s 1.5s forwards;
     }
-    /* Fallback: if Motion script fails, show items after 1s */
-    @supports (animation-name: none) {
-      .no-motion .list-row,
-      .no-motion .kanban-col,
-      .no-motion .timeline-item,
-      .no-motion table.table-view tbody tr { opacity: 1 !important; }
-    }
+    @keyframes motionFallback { to { opacity: 1; } }
 
     /* Magnetic wrapper — don't clip the element shift */
     [data-magnetic] { display: inline-flex; will-change: transform; }
@@ -1163,17 +1183,24 @@
 
 <footer class="site-footer">CuratedStack · Built with ♥ · <a href="#">About</a></footer>
 
-<div class="modal-backdrop" id="modal-backdrop"></div>
-<div class="modal" id="modal">
-  <div class="modal-header">
-    <div class="modal-title-row">
-      <div class="modal-icon-wrap"><img class="modal-icon" id="modal-icon" src="" alt="" onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}"></div>
-      <div><div class="modal-name" id="modal-name">—</div><div class="modal-meta" id="modal-meta">—</div></div>
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-icon-wrap">
+          <img class="modal-icon" id="modal-icon" src="" alt=""
+               onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}">
+        </div>
+        <div>
+          <div class="modal-name" id="modal-name">—</div>
+          <div class="modal-meta" id="modal-meta">—</div>
+        </div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
     </div>
-    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
   </div>
-  <div class="modal-body" id="modal-body"></div>
-  <div class="modal-footer" id="modal-footer"></div>
 </div>
 
 <script>
@@ -1364,10 +1391,20 @@ function openModal(id) {
   const pc      = getPricingClass(app.pricing_model)
   const fullDesc = app.detailed_description || app.description || 'No description available.'
 
+  let domain = ''
+  try { domain = new URL(app.url).hostname.replace(/^www\./, '') } catch (e) {}
+
   document.getElementById('modal-icon').src = favicon
+  document.getElementById('modal-icon').onerror = function() {
+    if (!this.dataset.err) { this.dataset.err='1'; this.src='logo.svg' }
+  }
   document.getElementById('modal-icon').alt = app.name
   document.getElementById('modal-name').textContent = app.name
-  document.getElementById('modal-meta').textContent = app.category || 'Uncategorized'
+  document.getElementById('modal-meta').innerHTML =
+    `<span style="color:var(--accent)">${app.category || 'Uncategorized'}</span>` +
+    (domain ? ` · <a href="${app.url}" target="_blank" rel="noopener"
+        style="color:var(--text-muted);text-decoration:none;font-size:11px"
+        onclick="event.stopPropagation()">${domain}</a>` : '')
 
   const pricingHtml = theme === 'win95'
     ? (app.pricing_model ? `<span class="win95-pricing ${pc}">${app.pricing_model.toUpperCase()}</span>` : '')
@@ -1385,37 +1422,34 @@ function openModal(id) {
     </div>`
 
   document.getElementById('modal-footer').innerHTML = `
-    <button class="btn ${hasUpvoted ? 'upvoted' : ''}" onclick="handleUpvote('${app.id}',this)">👍 <span>${app.upvotes||0}</span></button>
+    <button class="btn ${hasUpvoted ? 'upvoted' : ''}" onclick="handleUpvote('${app.id}',this)">
+      👍 <span>${app.upvotes||0}</span>
+    </button>
     <div style="text-align:center">
       <div class="rate-label">Rate this app</div>
       <div class="star-group">
         ${[1,2,3,4,5].map(i => `<button class="star-btn ${userRating>=i?'filled':''}" onclick="handleRating('${app.id}',${i},this)">${userRating>=i?'★':'☆'}</button>`).join('')}
       </div>
     </div>
-    <a href="${app.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
-      <button class="btn btn-primary">Visit →</button>
+    <a href="${app.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="modal-visit-link">
+      <button class="btn btn-primary modal-visit-btn">Visit site →</button>
     </a>`
 
-  document.getElementById('modal-backdrop').classList.add('active')
-  document.getElementById('modal').offsetHeight
-  document.getElementById('modal').classList.add('active')
+  const overlay = document.getElementById('modal-overlay')
+  overlay.classList.add('active')
   document.body.style.overflow = 'hidden'
 }
 
 function closeModal() {
-  const m = document.getElementById('modal')
-  m.style.opacity = '0'
-  m.style.transform = 'translate(-50%,-52%) scale(0.94)'
-  setTimeout(() => {
-    m.classList.remove('active')
-    m.style.opacity = m.style.transform = ''
-    document.getElementById('modal-backdrop').classList.remove('active')
-    document.body.style.overflow = ''
-  }, 220)
+  const overlay = document.getElementById('modal-overlay')
+  overlay.classList.remove('active')
+  document.body.style.overflow = ''
 }
 
 document.getElementById('modal-close').addEventListener('click', closeModal)
-document.getElementById('modal-backdrop').addEventListener('click', closeModal)
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal()
+})
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
 
 /* ─── UPVOTE ──────────────────────────────── */
@@ -1933,7 +1967,8 @@ loadApps()
 
 <!-- Motion One + Cursor + Magnetic + Animations -->
 <script type="module">
-import { animate, inView, stagger, spring } from 'https://cdn.jsdelivr.net/npm/motion@10.18.0/+esm'
+import { animate, inView, stagger } from 'https://cdn.jsdelivr.net/npm/motion@10.18.0/+esm'
+const SPRING_OVERSHOOT = [0.34, 1.36, 0.64, 1]   // feels springy without spring()
 
 /* ═══════════════════════════════════════════
    1. CUSTOM CURSOR
@@ -2005,7 +2040,7 @@ document.addEventListener('mousedown', e => {
 })
 document.addEventListener('mouseup', e => {
   const btn = e.target.closest('button, .view-btn')
-  if (btn) animate(btn, { scale: 1 }, { duration: 0.3, easing: spring({ stiffness: 500, damping: 22 }) })
+  if (btn) animate(btn, { scale: 1 }, { duration: 0.3, easing: SPRING_OVERSHOOT })
 })
 
 /* ═══════════════════════════════════════════
@@ -2066,38 +2101,57 @@ function animateIn (root) {
   initMagnetic()
 }
 
-// Watch for content changes
+// Watch for content changes — childList only (not subtree) to avoid firing on every click
 const appContainer = document.getElementById('app-container')
 new MutationObserver(() => requestAnimationFrame(() => animateIn(appContainer)))
-  .observe(appContainer, { childList: true, subtree: true })
+  .observe(appContainer, { childList: true, subtree: false })
 
 /* ═══════════════════════════════════════════
    5. VIEW SWITCH TRANSITION
 ═══════════════════════════════════════════ */
 const _origRender = window.renderApps
 window.renderApps = function () {
-  animate(appContainer, { opacity: 0.25 }, { duration: 0.08 })
+  animate(appContainer, { opacity: 0.2 }, { duration: 0.07 })
   _origRender.call(window)
-  animate(appContainer, { opacity: 1 }, { duration: 0.22, easing: EASE_OUT })
+  animate(appContainer, { opacity: 1 }, { duration: 0.2, easing: EASE_OUT })
 }
 
 /* ═══════════════════════════════════════════
    6. MODAL OPEN ANIMATION
+   — animate the .modal panel (NOT the overlay)
+   — overlay uses flexbox centering, no transform conflict
 ═══════════════════════════════════════════ */
 const _origOpen = window.openModal
 window.openModal = function (id) {
   _origOpen.call(window, id)
-  const modal = document.getElementById('modal')
-  if (modal) animate(modal, { opacity: [0,1], y: [18,0], scale: [0.97,1] },
-    { duration: 0.28, easing: spring({ stiffness: 340, damping: 26 }) })
+  const overlay = document.getElementById('modal-overlay')
+  const modal   = document.getElementById('modal')
+  if (overlay) animate(overlay, { opacity: [0, 1] }, { duration: 0.18, easing: EASE_OUT })
+  if (modal)   animate(modal,   { opacity: [0, 1], y: [20, 0], scale: [0.96, 1] },
+    { duration: 0.28, easing: [0.34, 1.2, 0.64, 1] })
+}
+
+const _origClose = window.closeModal
+let _closing = false
+window.closeModal = function () {
+  if (_closing) return
+  _closing = true
+  const overlay = document.getElementById('modal-overlay')
+  const modal   = document.getElementById('modal')
+  if (modal)   animate(modal,   { opacity: [1, 0], y: [0, 10], scale: [1, 0.97] }, { duration: 0.15 })
+  if (overlay) animate(overlay, { opacity: [1, 0] }, { duration: 0.18 })
+  setTimeout(() => { _origClose.call(window); _closing = false }, 200)
 }
 
 /* ═══════════════════════════════════════════
    7. HERO / NAV ENTRANCE (once)
 ═══════════════════════════════════════════ */
-animate('.hero',   { opacity: [0,1], y: [24,0] }, { duration: 0.5,  delay: 0.1,  easing: EASE_OUT })
-animate('.navbar', { opacity: [0,1], y: [-8,0] }, { duration: 0.4,  easing: EASE_OUT })
-animate('.filter-bar', { opacity: [0,1], y: [12,0] }, { duration: 0.35, delay: 0.15, easing: EASE_OUT })
+const hero      = document.querySelector('.hero')
+const navbar    = document.querySelector('.navbar')
+const filterBar = document.querySelector('.filter-bar')
+if (hero)      animate(hero,      { opacity: [0,1], y: [24,0] }, { duration: 0.5, delay: 0.1,  easing: EASE_OUT })
+if (navbar)    animate(navbar,    { opacity: [0,1], y: [-8,0] }, { duration: 0.4, easing: EASE_OUT })
+if (filterBar) animate(filterBar, { opacity: [0,1], y: [12,0] }, { duration: 0.35, delay: 0.15, easing: EASE_OUT })
 
 /* ═══════════════════════════════════════════
    8. STATS COUNTER ANIMATION (via MutationObserver)
