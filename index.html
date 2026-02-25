@@ -1981,6 +1981,7 @@ const SPRING_OVERSHOOT = [0.34, 1.36, 0.64, 1]   // feels springy without spring
   if (!dot || !ring) return
 
   let mX = -200, mY = -200, rX = -200, rY = -200
+  let lastRingClass = 'cs-cursor-ring'
 
   document.addEventListener('mousemove', e => { mX = e.clientX; mY = e.clientY }, { passive: true })
 
@@ -1989,17 +1990,19 @@ const SPRING_OVERSHOOT = [0.34, 1.36, 0.64, 1]   // feels springy without spring
     rY += (mY - rY) * 0.14
     dot.style.transform  = `translate(calc(${mX}px - 50%), calc(${mY}px - 50%))`
     ring.style.transform = `translate(calc(${rX}px - 50%), calc(${rY}px - 50%))`
+
+    // Detekcia elementu pod kurzorom max 60x/sek (namiesto mouseover eventu)
+    const el = document.elementFromPoint(mX, mY)
+    if (el) {
+      const cta = el.closest('[data-magnetic]')
+      const btn = !cta && el.closest('button, a, [onclick], .app-card, .list-row, .kanban-card, .timeline-card, select, input')
+      const txt = !cta && !btn && el.closest('p, h1, h2, h3, li')
+      const newClass = 'cs-cursor-ring' + (cta ? ' is-cta' : btn ? ' is-hover' : txt ? ' is-text' : '')
+      if (newClass !== lastRingClass) { ring.className = lastRingClass = newClass }
+    }
+
     requestAnimationFrame(tick)
   })()
-
-  document.addEventListener('mouseover', e => {
-    const el  = e.target
-    const cta = el.closest('[data-magnetic]')
-    const btn = el.closest('button, a, [onclick], .app-card, .list-row, .kanban-card, .timeline-card, select, input')
-    const txt = el.closest('p, h1, h2, h3, li')
-    ring.className = 'cs-cursor-ring' + (cta ? ' is-cta' : btn ? ' is-hover' : txt ? ' is-text' : '')
-    dot.className  = 'cs-cursor-dot'
-  })
 
   document.addEventListener('mousedown', () => dot.classList.add('is-press'))
   document.addEventListener('mouseup',   () => dot.classList.remove('is-press'))
