@@ -1987,8 +1987,8 @@ const SPRING_OVERSHOOT = [0.34, 1.36, 0.64, 1]   // feels springy without spring
   ;(function tick () {
     rX += (mX - rX) * 0.14
     rY += (mY - rY) * 0.14
-    dot.style.left  = mX + 'px'; dot.style.top  = mY + 'px'
-    ring.style.left = rX + 'px'; ring.style.top = rY + 'px'
+    dot.style.transform  = `translate(calc(${mX}px - 50%), calc(${mY}px - 50%))`
+    ring.style.transform = `translate(calc(${rX}px - 50%), calc(${rY}px - 50%))`
     requestAnimationFrame(tick)
   })()
 
