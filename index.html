@@ -9,16 +9,16 @@
   <link rel="apple-touch-icon" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
     /* ══════════════════════════════════════════
        DESIGN TOKENS — DARK (default)
     ══════════════════════════════════════════ */
     :root {
-      --accent:       #a78bfa;
-      --accent-2:     #38bdf8;
-      --accent-rgb:   167,139,250;
+      --accent:       #10b981;
+      --accent-2:     #34d399;
+      --accent-rgb:   16,185,129;
 
       --text:         rgba(255,255,255,0.92);
       --text-muted:   rgba(255,255,255,0.50);
@@ -52,9 +52,9 @@
        LIGHT MODE
     ══════════════════════════════════════════ */
     [data-theme="light"] {
-      --accent:       #7c3aed;
-      --accent-2:     #0284c7;
-      --accent-rgb:   124,58,237;
+      --accent:       #059669;
+      --accent-2:     #0d9488;
+      --accent-rgb:   5,150,105;
       --text:         rgba(15,10,40,0.92);
       --text-muted:   rgba(15,10,40,0.52);
       --text-faint:   rgba(15,10,40,0.30);
@@ -128,15 +128,15 @@
     .orb-1 {
       width: 500px; height: 500px;
       top: -100px; left: -100px;
-      background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%);
     }
     .orb-2 {
       width: 400px; height: 400px;
       bottom: -80px; right: -80px;
       background: radial-gradient(circle, rgba(56,189,248,0.14) 0%, transparent 70%);
     }
-    [data-theme="light"] .orb-1 { background: radial-gradient(circle,rgba(124,58,237,0.09) 0%,transparent 70%); }
-    [data-theme="light"] .orb-2 { background: radial-gradient(circle,rgba(56,189,248,0.07) 0%,transparent 70%); }
+    [data-theme="light"] .orb-1 { background: radial-gradient(circle,rgba(5,150,105,0.09) 0%,transparent 70%); }
+    [data-theme="light"] .orb-2 { background: radial-gradient(circle,rgba(13,148,136,0.07) 0%,transparent 70%); }
 
     /* ══════════════════════════════════════════
        WIN95 OVERRIDES (applied via JS class)
@@ -654,12 +654,12 @@
     .btn:active { transform: translateY(0) scale(0.97); }
     .btn.upvoted { background: rgba(var(--accent-rgb),0.16); border-color: rgba(var(--accent-rgb),0.42); color: var(--accent); }
     .btn-primary {
-      background: linear-gradient(135deg, rgba(124,58,237,0.70), rgba(56,189,248,0.50));
+      background: linear-gradient(135deg, rgba(16,185,129,0.70), rgba(52,211,153,0.50));
       border-color: rgba(var(--accent-rgb),0.50);
       color: #fff; padding: 10px 22px; font-size: 13px; border-radius: var(--radius-md);
     }
     .btn-primary:hover {
-      background: linear-gradient(135deg, rgba(124,58,237,0.90), rgba(56,189,248,0.70));
+      background: linear-gradient(135deg, rgba(16,185,129,0.90), rgba(52,211,153,0.70));
       border-color: rgba(var(--accent-rgb),0.80);
       box-shadow: 0 4px 20px rgba(var(--accent-rgb),0.35); color: #fff;
     }
@@ -1049,6 +1049,201 @@
     [data-theme="win95"] .cs-cursor-ring { display: none; }
 
     /* ══════════════════════════════════════════
+       TERMINAL / MATRIX THEME
+    ══════════════════════════════════════════ */
+    [data-theme="terminal"] {
+      --accent:       #00ff41;
+      --accent-2:     #39ff14;
+      --accent-rgb:   0,255,65;
+      --text:         rgba(0,255,65,0.92);
+      --text-muted:   rgba(0,255,65,0.55);
+      --text-faint:   rgba(0,255,65,0.28);
+      --glass-bg:     rgba(0,255,65,0.04);
+      --glass-bg-h:   rgba(0,255,65,0.09);
+      --glass-modal:  rgba(0,6,0,0.94);
+      --glass-border: rgba(0,255,65,0.18);
+      --glass-bdr-h:  rgba(0,255,65,0.50);
+      --nav-bg:       rgba(0,4,0,0.88);
+      --sh-card:      0 0 0 1px rgba(0,255,65,0.15), 0 4px 24px rgba(0,0,0,0.8);
+      --sh-hover:     0 0 0 1px rgba(0,255,65,0.55), 0 0 28px rgba(0,255,65,0.18);
+      --sh-modal:     0 0 80px rgba(0,255,65,0.20), 0 0 0 1px rgba(0,255,65,0.3);
+      --skel-from:    rgba(0,255,65,0.03);
+      --skel-to:      rgba(0,255,65,0.09);
+      --font:         'JetBrains Mono', 'Courier New', monospace;
+      background: #000 !important;
+    }
+    [data-theme="terminal"] body {
+      background: #000 !important;
+      font-family: var(--font) !important;
+    }
+    [data-theme="terminal"] body::before { display: none !important; }
+    [data-theme="terminal"] .orb { display: none !important; }
+
+    /* CRT scanlines overlay */
+    [data-theme="terminal"] body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+    }
+
+    /* Matrix rain canvas */
+    #matrix-canvas {
+      display: none;
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+    }
+    [data-theme="terminal"] #matrix-canvas { display: block; }
+
+    /* Navbar */
+    [data-theme="terminal"] .navbar {
+      background: rgba(0,4,0,0.90) !important;
+      border-bottom: 1px solid rgba(0,255,65,0.25) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    [data-theme="terminal"] .brand-gradient {
+      background: none !important;
+      -webkit-text-fill-color: #00ff41 !important;
+      text-shadow: 0 0 12px rgba(0,255,65,0.7) !important;
+      font-family: var(--font) !important;
+    }
+    [data-theme="terminal"] .hero-title,
+    [data-theme="terminal"] .gradient-text {
+      background: none !important;
+      -webkit-text-fill-color: #00ff41 !important;
+      text-shadow: 0 0 20px rgba(0,255,65,0.5) !important;
+    }
+
+    /* Terminal cards */
+    .terminal-card {
+      background: rgba(0,6,0,0.80);
+      border: 1px solid rgba(0,255,65,0.22);
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color var(--trans), box-shadow var(--trans), background var(--trans);
+      position: relative;
+    }
+    .terminal-card:hover {
+      border-color: rgba(0,255,65,0.60);
+      box-shadow: 0 0 0 1px rgba(0,255,65,0.4), 0 0 28px rgba(0,255,65,0.12);
+      background: rgba(0,12,0,0.90);
+    }
+    .terminal-titlebar {
+      background: rgba(0,255,65,0.10);
+      border-bottom: 1px solid rgba(0,255,65,0.20);
+      padding: 6px 12px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: #00ff41;
+      font-family: var(--font);
+    }
+    .terminal-titlebar-dots {
+      display: flex; gap: 5px;
+    }
+    .terminal-titlebar-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(0,255,65,0.25);
+      border: 1px solid rgba(0,255,65,0.4);
+    }
+    .terminal-titlebar-dots span:first-child { background: rgba(0,255,65,0.55); }
+    .terminal-titlebar-name { flex: 1; opacity: 0.8; letter-spacing: 0.03em; }
+    .terminal-body { padding: 12px; }
+    .terminal-prompt {
+      font-size: 10px; color: rgba(0,255,65,0.45);
+      margin-bottom: 3px; letter-spacing: 0.04em;
+    }
+    .terminal-desc {
+      font-size: 12px; color: rgba(0,255,65,0.82);
+      line-height: 1.55; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .terminal-tags {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;
+    }
+    .terminal-tag {
+      font-size: 10px; color: rgba(0,255,65,0.65);
+      border: 1px solid rgba(0,255,65,0.25);
+      padding: 2px 7px; border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+    .terminal-tag.pricing {
+      color: #00ff41; border-color: rgba(0,255,65,0.55);
+      background: rgba(0,255,65,0.08);
+    }
+    .terminal-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid rgba(0,255,65,0.12); padding-top: 9px;
+    }
+    .terminal-upvote-btn {
+      background: transparent; border: 1px solid rgba(0,255,65,0.30);
+      color: rgba(0,255,65,0.70); font-size: 11px;
+      padding: 3px 10px; cursor: pointer; border-radius: 2px;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .terminal-upvote-btn:hover { background: rgba(0,255,65,0.1); color: #00ff41; border-color: rgba(0,255,65,0.6); }
+    .terminal-upvote-btn.upvoted { background: rgba(0,255,65,0.12); color: #00ff41; border-color: rgba(0,255,65,0.55); }
+    .terminal-rating { font-size: 11px; color: rgba(0,255,65,0.50); }
+
+    /* Filter bar */
+    [data-theme="terminal"] .search-input,
+    [data-theme="terminal"] .filter-select {
+      font-family: var(--font) !important;
+      background: rgba(0,8,0,0.80) !important;
+      border-color: rgba(0,255,65,0.25) !important;
+      color: #00ff41 !important;
+      caret-color: #00ff41;
+    }
+    [data-theme="terminal"] .search-input::placeholder { color: rgba(0,255,65,0.35) !important; }
+    [data-theme="terminal"] .search-icon { color: rgba(0,255,65,0.5) !important; }
+    [data-theme="terminal"] .view-btn { border-radius: 2px !important; font-family: var(--font) !important; }
+    [data-theme="terminal"] .view-btn.active {
+      background: rgba(0,255,65,0.15) !important;
+      color: #00ff41 !important; border-color: rgba(0,255,65,0.5) !important;
+    }
+    [data-theme="terminal"] .filter-select option { background: #000; color: #00ff41; }
+
+    /* Modal */
+    [data-theme="terminal"] .modal {
+      border: 1px solid rgba(0,255,65,0.35) !important;
+      box-shadow: var(--sh-modal) !important;
+      font-family: var(--font) !important;
+    }
+    [data-theme="terminal"] .modal::before { display: none !important; }
+    [data-theme="terminal"] .modal-name { text-shadow: 0 0 12px rgba(0,255,65,0.4); }
+
+    /* Theme toggle */
+    [data-theme="terminal"] .theme-toggle {
+      background: rgba(0,255,65,0.08) !important;
+      border-color: rgba(0,255,65,0.35) !important;
+      color: #00ff41 !important;
+      font-family: var(--font) !important;
+    }
+    [data-theme="terminal"] .btn-submit-app {
+      background: rgba(0,255,65,0.10) !important;
+      border-color: rgba(0,255,65,0.35) !important;
+      color: #00ff41 !important;
+      font-family: var(--font) !important;
+    }
+
+    /* Footer */
+    [data-theme="terminal"] .site-footer {
+      border-color: rgba(0,255,65,0.15) !important;
+      color: rgba(0,255,65,0.40) !important;
+      font-family: var(--font) !important;
+    }
+
+    /* Cursor */
+    [data-theme="terminal"] .cs-cursor-dot { background: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
+    [data-theme="terminal"] .cs-cursor-ring { border-color: rgba(0,255,65,0.6) !important; box-shadow: 0 0 12px rgba(0,255,65,0.3); }
+
+    /* ══════════════════════════════════════════
        MOTION — general helpers
     ══════════════════════════════════════════ */
     /* View container transition */
@@ -1115,6 +1310,7 @@
 <div id="cs-cursor-ring" class="cs-cursor-ring" aria-hidden="true"></div>
 
 <canvas id="bg-canvas"></canvas>
+<canvas id="matrix-canvas"></canvas>
 <div class="orb orb-1" id="orb1"></div>
 <div class="orb orb-2" id="orb2"></div>
 <button id="back-to-top" data-magnetic aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -1218,9 +1414,9 @@ let sortCol = 'name', sortDir = 1
 let kanbanIdx = 0
 
 /* ─── THEME ENGINE ────────────────────────── */
-const THEMES = ['dark', 'light', 'win95']
-const THEME_ICONS  = { dark: '🌙', light: '☀️', win95: '🖥️' }
-const THEME_LABELS = { dark: 'Dark', light: 'Light', win95: 'Win95' }
+const THEMES = ['dark', 'light', 'win95', 'terminal']
+const THEME_ICONS  = { dark: '🌙', light: '☀️', win95: '🖥️', terminal: '💻' }
+const THEME_LABELS = { dark: 'Dark', light: 'Light', win95: 'Win95', terminal: 'Matrix' }
 
 const html     = document.documentElement
 const themeBtn = document.getElementById('theme-toggle')
@@ -1236,8 +1432,15 @@ function applyTheme(t) {
 
   if (t === 'win95') {
     loadWin95CSS()
+    stopMatrixRain()
   } else {
     unloadWin95CSS()
+  }
+
+  if (t === 'terminal') {
+    startMatrixRain()
+  } else {
+    stopMatrixRain()
   }
 
   // Re-render so correct card template is used
@@ -1271,7 +1474,7 @@ const orb1 = document.getElementById('orb1')
 const orb2 = document.getElementById('orb2')
 let rafP = false
 document.addEventListener('mousemove', e => {
-  if (theme === 'win95') return
+  if (theme === 'win95' || theme === 'terminal') return
   const x = e.clientX / window.innerWidth  - 0.5
   const y = e.clientY / window.innerHeight - 0.5
   if (!rafP) {
@@ -1302,6 +1505,7 @@ function getPricingClass(p) {
 /* ─── GLASS CARD ──────────────────────────── */
 function createCard(app, delay = 0) {
   if (theme === 'win95') return createCardWin95(app)
+  if (theme === 'terminal') return createCardTerminal(app)
   const upvoted = !!localStorage.getItem(`upvoted_${app.id}`)
   const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const favicon = app.logo_url || getFavicon(app.url)
@@ -1361,6 +1565,39 @@ function createCardWin95(app) {
           <button class="win95-upvote-btn ${upvoted ? 'upvoted' : ''}"
                   onclick="event.stopPropagation();handleUpvote('${app.id}',this)">👍 <span>${app.upvotes||0}</span></button>
           <span style="font-size:11px;color:#444">${avg ? `★ ${avg}` : 'No ratings'}</span>
+        </div>
+      </div>
+    </div>`
+}
+
+function createCardTerminal(app) {
+  const upvoted = !!localStorage.getItem(`upvoted_${app.id}`)
+  const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
+  const pc      = getPricingClass(app.pricing_model)
+  const pricing = app.pricing_model
+    ? `<span class="terminal-tag pricing">[${app.pricing_model.toUpperCase()}]</span>` : ''
+  const tags = (app.tags || []).slice(0, 3).map(t => `<span class="terminal-tag">${t}</span>`).join('')
+  const rating = avg ? `★ ${avg}` : 'N/A'
+  const pid = app.id.toString().padStart(4, '0')
+  return `
+    <div class="terminal-card" data-id="${app.id}" onclick="openModal('${app.id}')">
+      <div class="terminal-titlebar">
+        <div class="terminal-titlebar-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="terminal-titlebar-name">> process/${app.name.toLowerCase().replace(/\s+/g,'-')}.sh [PID:${pid}]</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-prompt">$ cat README.md</div>
+        <div class="terminal-desc">${app.description || 'No description available.'}</div>
+        <div class="terminal-prompt">$ ls ./tags</div>
+        <div class="terminal-tags">${pricing}${tags}</div>
+        <div class="terminal-footer">
+          <button class="terminal-upvote-btn ${upvoted ? 'upvoted' : ''}"
+                  onclick="event.stopPropagation();handleUpvote('${app.id}',this)">
+            ^upvote [<span>${app.upvotes||0}</span>]
+          </button>
+          <span class="terminal-rating">rating: ${rating}</span>
         </div>
       </div>
     </div>`
@@ -1961,6 +2198,107 @@ loadApps()
     }
   })
 })()
+
+/* ═══════════════════════════════════════════
+   MATRIX RAIN ENGINE
+═══════════════════════════════════════════ */
+let matrixRaf = null
+let matrixRunning = false
+
+function startMatrixRain() {
+  if (matrixRunning) return
+  matrixRunning = true
+
+  const canvas  = document.getElementById('matrix-canvas')
+  const ctx     = canvas.getContext('2d')
+
+  // Matrix chars: katakana + digits + symbols
+  const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF$%&#@!?><'
+  const FONT_SIZE = 14
+  const CURSOR_RADIUS = 120   // px radius where rain slows
+  const SLOW_FACTOR   = 0.08  // fraction of normal speed near cursor
+
+  let cols, drops, speeds, opacities
+  let cursorX = -999, cursorY = -999
+
+  function resize() {
+    canvas.width  = window.innerWidth
+    canvas.height = window.innerHeight
+    cols     = Math.floor(canvas.width / FONT_SIZE)
+    drops    = new Float32Array(cols).fill(1)
+    speeds   = new Float32Array(cols).map(() => 0.3 + Math.random() * 0.7)
+    opacities= new Float32Array(cols).map(() => 0.6 + Math.random() * 0.4)
+  }
+  resize()
+  window.addEventListener('resize', resize)
+
+  // Track cursor for slowdown effect (terminal theme only)
+  function onMouseMove(e) { cursorX = e.clientX; cursorY = e.clientY }
+  document.addEventListener('mousemove', onMouseMove, { passive: true })
+
+  function draw() {
+    if (!matrixRunning) return
+
+    // Fade trail
+    ctx.fillStyle = 'rgba(0,0,0,0.045)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    for (let i = 0; i < cols; i++) {
+      const x = i * FONT_SIZE
+      const y = drops[i] * FONT_SIZE
+
+      // Distance from cursor → slow factor
+      const dx  = x - cursorX
+      const dy  = y - cursorY
+      const dist = Math.sqrt(dx*dx + dy*dy)
+      const inZone = dist < CURSOR_RADIUS
+      const speedMult = inZone
+        ? SLOW_FACTOR + (1 - SLOW_FACTOR) * (dist / CURSOR_RADIUS)
+        : 1
+
+      // Head char — bright green glow
+      ctx.shadowBlur  = inZone ? 0 : 8
+      ctx.shadowColor = '#00ff41'
+      ctx.fillStyle   = `rgba(180,255,200,${opacities[i]})`
+      ctx.font        = `${FONT_SIZE}px 'JetBrains Mono', monospace`
+      const head = CHARS[Math.floor(Math.random() * CHARS.length)]
+      ctx.fillText(head, x, y)
+
+      // Tail chars — dimmer
+      ctx.shadowBlur = 0
+      ctx.fillStyle  = `rgba(0,${180 + Math.floor(opacities[i]*75)},65,0.75)`
+      const tail = CHARS[Math.floor(Math.random() * CHARS.length)]
+      ctx.fillText(tail, x, y - FONT_SIZE)
+
+      drops[i] += speeds[i] * speedMult
+
+      // Reset column when it hits bottom
+      if (drops[i] * FONT_SIZE > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0
+        opacities[i] = 0.5 + Math.random() * 0.5
+      }
+    }
+
+    matrixRaf = requestAnimationFrame(draw)
+  }
+
+  draw()
+
+  // Store cleanup references on canvas element
+  canvas._matrixCleanup = () => {
+    window.removeEventListener('resize', resize)
+    document.removeEventListener('mousemove', onMouseMove)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+  }
+}
+
+function stopMatrixRain() {
+  if (!matrixRunning) return
+  matrixRunning = false
+  if (matrixRaf) { cancelAnimationFrame(matrixRaf); matrixRaf = null }
+  const canvas = document.getElementById('matrix-canvas')
+  if (canvas && canvas._matrixCleanup) { canvas._matrixCleanup(); delete canvas._matrixCleanup }
+}
 </script>
 
 <!-- Lottie Player -->
