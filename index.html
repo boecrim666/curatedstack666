@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CuratedStack - Curated Apps Directory</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="icon" type="image/png" href="favicon.svg">
-  <link rel="apple-touch-icon" href="logo.svg">
+  <link rel="icon" type="image/png" href="logo-light.png">
+  <link rel="apple-touch-icon" href="logo-light.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -254,7 +253,7 @@
       font-weight: 700; font-size: 17px; letter-spacing: -0.3px;
       color: var(--text); text-decoration: none;
     }
-    .navbar-brand img { width: 28px; height: 28px; }
+    .navbar-brand img { height: 28px; width: auto; max-width: 52px; object-fit: contain; }
     .brand-gradient {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       -webkit-background-clip: text;
@@ -486,11 +485,43 @@
        FILTER BAR
     ══════════════════════════════════════════ */
     .filter-bar {
-      display: flex; gap: 12px; align-items: center;
-      max-width: 700px; margin: 0 auto 44px;
-      flex-wrap: wrap;
+      display: flex; flex-direction: column; gap: 10px;
+      max-width: 760px; margin: 0 auto 44px;
       animation: fadeSlideUp 0.6s 0.1s cubic-bezier(.22,1,.36,1) both;
     }
+    .filter-row-top {
+      display: flex; gap: 12px; align-items: center;
+    }
+
+    /* Category pills row */
+    .cat-pills-row {
+      display: flex; flex-wrap: nowrap; gap: 6px;
+      overflow-x: auto; padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .cat-pills-row::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      flex-shrink: 0;
+      font-size: 12px; font-weight: 500;
+      padding: 5px 14px; border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-muted);
+      cursor: pointer; white-space: nowrap;
+      transition: all var(--trans);
+      font-family: var(--font);
+    }
+    .cat-pill:hover {
+      border-color: rgba(var(--accent-rgb),0.40);
+      color: var(--accent); background: rgba(var(--accent-rgb),0.07);
+    }
+    .cat-pill.active {
+      background: rgba(var(--accent-rgb),0.14);
+      border-color: rgba(var(--accent-rgb),0.50);
+      color: var(--accent); font-weight: 600;
+    }
+    [data-theme="terminal"] .cat-pill { font-family: var(--font) !important; border-radius: 2px !important; }
+    [data-theme="win95"] .cat-pills-row { display: none; }
     .search-wrap { flex: 1; min-width: 200px; position: relative; }
     .search-icon {
       position: absolute; left: 14px; top: 50%;
@@ -668,10 +699,11 @@
       transition: color 0.3s;
     }
 
-    .tags-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; min-height: 22px; }
+    .tags-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 16px; min-height: 22px; }
     .tag {
-      font-size: 10px; font-weight: 500;
-      padding: 2px 8px; border-radius: 100px;
+      display: inline-flex; align-items: center;
+      font-size: 10px; font-weight: 500; line-height: 1;
+      padding: 3px 9px; border-radius: 100px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.10);
       color: var(--text-muted); white-space: nowrap;
@@ -1226,7 +1258,7 @@
 
     /* Terminal cards */
     .terminal-card {
-      background: rgba(0,6,0,0.80);
+      background: rgba(0,8,0,0.92);
       border: 1px solid rgba(0,255,65,0.22);
       border-radius: 4px;
       overflow: hidden;
@@ -1345,8 +1377,27 @@
     }
 
     /* Cursor */
+    [data-theme="terminal"] #nav-logo { filter: invert(1) sepia(1) saturate(4) hue-rotate(90deg) brightness(1.1); }
     [data-theme="terminal"] .cs-cursor-dot { background: #00ff41 !important; box-shadow: 0 0 8px #00ff41; }
     [data-theme="terminal"] .cs-cursor-ring { border-color: rgba(0,255,65,0.6) !important; box-shadow: 0 0 12px rgba(0,255,65,0.3); }
+
+    /* Cards/content z-indexing over matrix rain */
+    [data-theme="terminal"] .app-card {
+      background: rgba(0,10,4,0.93) !important;
+      backdrop-filter: blur(12px) !important;
+    }
+    [data-theme="terminal"] .list-row {
+      background: rgba(0,10,4,0.93) !important;
+      backdrop-filter: blur(12px) !important;
+    }
+    [data-theme="terminal"] .filter-bar,
+    [data-theme="terminal"] .search-input,
+    [data-theme="terminal"] .cat-pills-row {
+      position: relative; z-index: 2;
+    }
+    [data-theme="terminal"] #app-container { position: relative; z-index: 2; }
+    [data-theme="terminal"] .navbar { z-index: 101; }
+    [data-theme="terminal"] .hero { position: relative; z-index: 2; }
 
     /* ══════════════════════════════════════════
        MOTION — general helpers
@@ -1423,16 +1474,11 @@
 <!-- ── NAVBAR ──────────────────────────────────── -->
 <nav class="navbar">
   <a class="navbar-brand" href="#">
-    <img src="logo.svg" alt="CuratedStack" id="nav-logo" onerror="this.style.display='none'">
+    <img src="logo-dark.png" alt="CuratedStack" id="nav-logo">
     <span class="brand-gradient">CuratedStack</span>
   </a>
   <div class="navbar-right">
-    <div class="navbar-stats">
-      <span><strong id="nav-count">—</strong> apps</span>
-      <span><strong id="nav-upvotes">—</strong> upvotes</span>
-      <span>avg <strong id="nav-rating">—</strong>⭐</span>
-    </div>
-    <a class="btn-submit-app" id="btn-submit" data-magnetic href="mailto:submit@curatedstack.com?subject=Submit%20App" title="Submit an app">
+    <a class="btn-submit-app" id="btn-submit" data-magnetic href="mailto:jarvisclawisopen@gmail.com?subject=Submit%20App%20to%20CuratedStack" title="Submit an app">
       <span>+</span><span>Submit app</span>
     </a>
     <button class="theme-toggle" id="theme-toggle" data-magnetic aria-label="Switch theme">
@@ -1446,7 +1492,7 @@
 <div class="wrapper">
 
   <div class="hero">
-    <div class="hero-eyebrow"><span style="margin-left:6px">◎ Live directory</span></div>
+    <div class="hero-eyebrow">✦ Curated by Boe</div>
     <h1 class="hero-title">The internet's best<br><span class="gradient-text">stack, hand-picked</span></h1>
     <p class="hero-sub">AI tools, dev resources, design utilities and beyond — curated, rated, and updated constantly by real humans.</p>
 
@@ -1483,19 +1529,21 @@
   </div>
 
   <div class="filter-bar">
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
+    <div class="filter-row-top">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
+      </div>
+      <div class="view-switcher" id="view-switcher">
+        <button class="view-btn" data-view="grid"     title="Grid">⊞</button>
+        <button class="view-btn" data-view="list"     title="List">≡</button>
+        <button class="view-btn" data-view="table"    title="Table">⊟</button>
+        <button class="view-btn" data-view="kanban"   title="Board">⋮⋮</button>
+        <button class="view-btn" data-view="timeline" title="Timeline">◎</button>
+      </div>
     </div>
-    <select id="category-filter" class="filter-select">
-      <option value="all">All Categories</option>
-    </select>
-    <div class="view-switcher" id="view-switcher">
-      <button class="view-btn" data-view="grid"     title="Grid">⊞</button>
-      <button class="view-btn" data-view="list"     title="List">≡</button>
-      <button class="view-btn" data-view="table"    title="Table">⊟</button>
-      <button class="view-btn" data-view="kanban"   title="Board">⋮⋮</button>
-      <button class="view-btn" data-view="timeline" title="Timeline">◎</button>
+    <div class="cat-pills-row" id="cat-pills">
+      <button class="cat-pill active" onclick="setCat('all')">All</button>
     </div>
   </div>
 
@@ -1558,12 +1606,23 @@ const themeBtn = document.getElementById('theme-toggle')
 let theme = localStorage.getItem('cs-theme') || 'dark'
 let win95Link = null
 
+const LOGO_SRCS = {
+  dark:     'logo-dark.png',
+  terminal: 'logo-dark.png',
+  light:    'logo-light.png',
+  win95:    'logo-light.png',
+}
+
 function applyTheme(t) {
   theme = t
   html.setAttribute('data-theme', t)
   document.getElementById('t-icon').textContent  = THEME_ICONS[t]
   document.getElementById('t-label').textContent = THEME_LABELS[t]
   localStorage.setItem('cs-theme', t)
+
+  // Swap logo
+  const logoEl = document.getElementById('nav-logo')
+  if (logoEl) logoEl.src = LOGO_SRCS[t] || 'logo-dark.png'
 
   if (t === 'win95') {
     loadWin95CSS()
@@ -1623,6 +1682,25 @@ document.addEventListener('mousemove', e => {
 })
 
 /* ─── HELPERS ─────────────────────────────── */
+/* ─── CATEGORY PILLS ──────────────────────── */
+function renderCatPills(cats) {
+  const el = document.getElementById('cat-pills')
+  if (!el) return
+  const all = `<button class="cat-pill ${currentCategory === 'all' ? 'active' : ''}" onclick="setCat('all')">All</button>`
+  const rest = cats.map(c =>
+    `<button class="cat-pill ${currentCategory === c ? 'active' : ''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">` + c + `</button>`
+  ).join('')
+  el.innerHTML = all + rest
+}
+
+function setCat(cat) {
+  currentCategory = cat
+  document.querySelectorAll('.cat-pill').forEach(b => {
+    b.classList.toggle('active', b.textContent === cat || (cat === 'all' && b.textContent === 'All'))
+  })
+  renderApps()
+}
+
 function getFavicon(url) {
   try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64` }
   catch { return 'logo.svg' }
@@ -2165,10 +2243,10 @@ function updateStats() {
   const rated   = allApps.filter(a => a.rating_count > 0)
   const avg     = rated.length ? (rated.reduce((s, a) => s + a.rating_sum / a.rating_count, 0) / rated.length).toFixed(1) : '—'
 
-  // Navbar
-  document.getElementById('nav-count').textContent   = allApps.length
-  document.getElementById('nav-upvotes').textContent = upvotes
-  document.getElementById('nav-rating').textContent  = avg
+  // Navbar (hidden — elements may not exist, guard with ?.)
+  const nc = document.getElementById('nav-count');   if (nc) nc.textContent = allApps.length
+  const nu = document.getElementById('nav-upvotes'); if (nu) nu.textContent = upvotes
+  const nr = document.getElementById('nav-rating');  if (nr) nr.textContent = avg
 
   // Hero stats — count-up animation
   countUp(document.getElementById('stat-apps'),  allApps.length, 900)
@@ -2180,7 +2258,7 @@ function updateStats() {
   if (badgesEl && cats.size > 0) {
     const catList = [...cats].slice(0, 7)
     badgesEl.innerHTML = catList.map(c =>
-      `<span class="hero-badge" onclick="document.getElementById('category-filter').value='${c}';currentCategory='${c}';renderApps()">${c}</span>`
+      `<span class="hero-badge" onclick="setCat('${c.replace(/'/g,"\\'")}')">${c}</span>`
     ).join('')
   }
 }
@@ -2199,8 +2277,7 @@ async function loadApps() {
     allApps = data
 
     const cats = [...new Set(allApps.map(a => a.category).filter(Boolean))].sort()
-    document.getElementById('category-filter').innerHTML =
-      '<option value="all">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('')
+    renderCatPills(cats)
 
     if (skel) skel.remove()
     renderApps()
@@ -2223,9 +2300,7 @@ document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => { currentSearch = e.target.value; renderApps() }, 250)
 })
-document.getElementById('category-filter').addEventListener('change', e => {
-  currentCategory = e.target.value; renderApps()
-})
+// category selection handled by cat-pills (setCat)
 document.querySelectorAll('.view-btn').forEach(btn => {
   btn.addEventListener('click', () => setView(btn.dataset.view))
 })
