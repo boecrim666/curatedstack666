@@ -74,7 +74,7 @@
        RESET & BASE (glass themes)
     ══════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
       font-family: var(--font);
@@ -159,10 +159,7 @@
     [data-theme="win95"] .navbar-top {
       background: #c0c0c0; padding: 4px 8px; height: auto; gap: 6px;
     }
-    [data-theme="win95"] .navbar-cats-inline {
-      background: #c0c0c0; padding: 2px 4px;
-    }
-    [data-theme="win95"] .navbar-cats-inline::after { display: none; }
+
     [data-theme="win95"] .search-input {
       border: 2px inset #808080 !important; border-radius: 0 !important;
       background: white !important; color: black !important; font-family: 'Fixedsys', monospace !important;
@@ -268,12 +265,15 @@
       background-clip: text;
     }
     .navbar-search {
-      flex: 1; min-width: 0; max-width: 500px;
-      display: flex; flex-direction: column; gap: 5px;
-      justify-content: center;
+      flex: 1; min-width: 0; max-width: 540px;
+      display: flex; align-items: center;
+    }
+    .search-and-filter {
+      display: flex; align-items: center; gap: 6px;
+      width: 100%;
     }
     .search-wrap {
-      position: relative; display: flex; align-items: center;
+      flex: 1; position: relative; display: flex; align-items: center;
     }
     .search-icon {
       position: absolute; left: 10px; font-size: 15px; color: var(--text-faint); pointer-events: none; z-index: 1;
@@ -290,28 +290,74 @@
     }
     .search-input::placeholder { color: var(--text-faint); }
 
-    /* Categories inline below search */
-    .navbar-cats-inline {
-      position: relative; overflow: hidden;
+    /* Category dropdown */
+    .cat-dropdown-wrap {
+      position: relative; flex-shrink: 0;
     }
-    .navbar-cats-inline::after {
-      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 32px;
-      background: linear-gradient(to right, transparent, var(--nav-bg));
-      pointer-events: none; z-index: 1;
+    .cat-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 34px; padding: 0 12px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); color: var(--text-muted);
+      cursor: pointer; font-family: var(--font); font-size: 12px; font-weight: 600;
+      white-space: nowrap; transition: all var(--trans);
+      max-width: 160px; overflow: hidden; text-overflow: ellipsis;
     }
-    .navbar-cats-inline .cat-pills-row {
-      flex-wrap: nowrap !important;
-      overflow-x: auto; overflow-y: visible;
-      scrollbar-width: none; -ms-overflow-style: none;
-      padding: 2px 0;
-      gap: 5px;
+    .cat-dropdown-btn:hover {
+      border-color: rgba(var(--accent-rgb),0.45);
+      color: var(--accent); background: rgba(var(--accent-rgb),0.07);
     }
-    .navbar-cats-inline .cat-pills-row::-webkit-scrollbar { display: none; }
-    .navbar-cats-inline .cat-pill {
-      font-size: 11px; padding: 3px 10px; height: 24px;
-      flex-shrink: 0;
+    .cat-dropdown-btn.active-filter {
+      background: rgba(var(--accent-rgb),0.12);
+      border-color: rgba(var(--accent-rgb),0.50);
+      color: var(--accent);
     }
-    .navbar-cats-inline .cat-pill .cat-count { font-size: 9px; padding: 1px 4px; }
+    .cat-dropdown-arrow {
+      font-size: 11px; opacity: 0.6; transition: transform var(--trans); flex-shrink: 0;
+    }
+    .cat-dropdown-btn.open .cat-dropdown-arrow { transform: rotate(180deg); }
+    .cat-dropdown-panel {
+      display: none;
+      position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: 300px; max-width: 480px;
+      background: var(--glass-modal); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); padding: 14px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.3);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      z-index: 500;
+    }
+    .cat-dropdown-panel.open {
+      display: block;
+      animation: fadeIn 0.15s ease;
+    }
+    .cat-dropdown-panel .cat-pills-row {
+      flex-wrap: wrap !important;
+      gap: 6px; padding: 0;
+    }
+    .cat-dropdown-panel .cat-pill {
+      font-size: 11px; padding: 4px 11px;
+    }
+    /* Win95 overrides */
+    [data-theme="win95"] .cat-dropdown-btn {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      color: #000 !important; font-family: 'Fixedsys', monospace !important; height: 22px !important;
+    }
+    [data-theme="win95"] .cat-dropdown-panel {
+      border-radius: 0 !important; background: #f0f0f0 !important; border: 2px solid #808080 !important;
+    }
+    /* Terminal overrides */
+    [data-theme="terminal"] .cat-dropdown-btn {
+      background: transparent !important; border-color: rgba(0,255,65,0.30) !important;
+      color: rgba(0,255,65,0.70) !important; border-radius: 2px !important;
+    }
+    [data-theme="terminal"] .cat-dropdown-btn:hover {
+      background: rgba(0,255,65,0.08) !important; border-color: rgba(0,255,65,0.55) !important;
+      color: #00ff41 !important;
+    }
+    [data-theme="terminal"] .cat-dropdown-panel {
+      background: rgba(0,10,3,0.96) !important; border-color: rgba(0,255,65,0.25) !important; border-radius: 4px !important;
+    }
 
     .navbar-controls {
       display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0;
@@ -951,6 +997,30 @@
     .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
     .modal-section { margin-bottom: 20px; }
     .modal-desc { font-size: 14px; color: var(--text); line-height: 1.75; transition: color 0.3s; opacity: 0.88; }
+
+    /* Modal description formatting */
+    .modal-body p {
+      margin: 0 0 14px;
+      line-height: 1.7;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .modal-body p:last-child { margin-bottom: 0; }
+    .modal-body p:first-child { margin-top: 0; }
+
+    /* Divider between tags and description */
+    .modal-divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: 14px 0;
+      border: none;
+    }
+
+    /* Win95 modal text */
+    [data-theme="win95"] .modal-body p { font-size: 13px !important; line-height: 1.5 !important; color: #000 !important; }
+
+    /* Terminal modal text */
+    [data-theme="terminal"] .modal-body p { color: rgba(0,255,65,0.85) !important; font-family: 'Courier New', monospace !important; font-size: 13px !important; }
 
     .modal-footer {
       padding: 16px 24px; border-top: 1px solid var(--glass-border);
@@ -1649,16 +1719,25 @@
       .view-switcher { gap: 1px; }
       .view-btn { width: 28px !important; height: 28px !important; font-size: 12px !important; border-radius: 6px !important; }
       .view-btn[data-view="kanban"],
-      .view-btn[data-view="timeline"] { display: none !important; }
+      .view-btn[data-view="list"] { display: none !important; }
+
+      /* Search area on mobile: stacked */
+      .search-and-filter {
+        flex-direction: column; align-items: stretch; gap: 5px;
+      }
+      .cat-dropdown-btn { width: 100%; max-width: 100%; height: 32px; font-size: 11px; }
+      .cat-dropdown-panel { min-width: 100%; left: 0; right: 0; position: fixed; top: auto; bottom: 0; border-radius: 16px 16px 0 0 !important; padding: 16px; max-height: 50vh; overflow-y: auto; }
+
+      /* Mobile overflow fix */
+      * { max-width: 100%; box-sizing: border-box; }
+      .main-content { overflow-x: hidden; }
+      .hero { overflow-x: hidden; }
+      .app-grid { overflow-x: hidden; }
 
       /* Theme toggle compact */
       .theme-toggle { height: 30px !important; padding: 0 10px !important; font-size: 11px !important; border-radius: 16px !important; }
 
-      /* Categories: horizontal scroll, compact pills */
-      .navbar-cats-inline { padding: 0 0 6px; }
-      .navbar-cats-inline .cat-pills-row { gap: 4px; }
-      .navbar-cats-inline .cat-pill { font-size: 10px; padding: 3px 9px; height: 22px; border-radius: 100px; }
-      .navbar-cats-inline .cat-pill .cat-count { font-size: 8px; padding: 0 4px; }
+      /* Category dropdown mobile styles added below */
 
       /* Main content */
       .main-content { padding: 12px; }
@@ -1773,12 +1852,20 @@
       <span class="brand-gradient">CuratedStack</span>
     </a>
     <div class="navbar-search">
-      <div class="search-wrap">
-        <span class="search-icon">⌕</span>
-        <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
-      </div>
-      <div class="navbar-cats-inline">
-        <div class="cat-pills-row" id="cat-pills"></div>
+      <div class="search-and-filter">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
+        </div>
+        <div class="cat-dropdown-wrap" id="cat-dropdown-wrap">
+          <button class="cat-dropdown-btn" id="cat-dropdown-btn" type="button">
+            <span id="cat-dropdown-label">✦ All</span>
+            <span class="cat-dropdown-arrow">▾</span>
+          </button>
+          <div class="cat-dropdown-panel" id="cat-dropdown-panel">
+            <div class="cat-pills-row" id="cat-pills"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="navbar-controls">
@@ -2008,6 +2095,22 @@ function renderCatPills(cats) {
 function setCat(cat) {
   currentCategory = cat
   renderCatPills([...new Set(allApps.map(a => a.category).filter(Boolean))].sort())
+  // Update dropdown label
+  const lbl = document.getElementById('cat-dropdown-label')
+  const dropBtn = document.getElementById('cat-dropdown-btn')
+  const catPanel2 = document.getElementById('cat-dropdown-panel')
+  if (lbl) {
+    if (cat === 'all') {
+      lbl.textContent = '✦ All'
+      if (dropBtn) dropBtn.classList.remove('active-filter')
+    } else {
+      const icon = CATEGORY_ICONS[cat] || '✦'
+      lbl.textContent = icon + ' ' + cat
+      if (dropBtn) dropBtn.classList.add('active-filter')
+    }
+  }
+  // Close dropdown after selection
+  if (catPanel2) { catPanel2.classList.remove('open'); if (dropBtn) dropBtn.classList.remove('open') }
   renderApps()
 }
 
@@ -2134,6 +2237,30 @@ function observeCards() {
   document.querySelectorAll('.category-section:not(.visible)').forEach(c => catObserver.observe(c))
 }
 
+/* ─── FORMAT DESCRIPTION ──────────────────── */
+function formatDescription(text) {
+  if (!text || text.trim().length === 0) return '<p style="color:var(--text-faint);font-style:italic">No description available.</p>'
+  // Split into sentences (handle . ! ?)
+  const raw = text.trim()
+  // Split by sentence-ending punctuation followed by space+capital or end of string
+  const sentences = raw.match(/[^.!?…]+[.!?…]+(\s|$)/g)
+  if (!sentences || sentences.length <= 2) {
+    return `<p>${raw}</p>`
+  }
+  // Group into paragraphs of 2 sentences each
+  const paras = []
+  for (let i = 0; i < sentences.length; i += 2) {
+    const group = sentences.slice(i, i + 2).join('').trim()
+    if (group) paras.push(group)
+  }
+  // Any leftover text not captured (edge case)
+  const captured = paras.join(' ')
+  if (raw.length > captured.length + 10) {
+    paras.push(raw.slice(captured.length).trim())
+  }
+  return paras.map(p => `<p>${p.trim()}</p>`).join('')
+}
+
 /* ─── MODAL ───────────────────────────────── */
 function openModal(id) {
   const app = allApps.find(a => a.id === id)
@@ -2169,8 +2296,9 @@ function openModal(id) {
 
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-section">
-      <div class="tags-row" style="margin-bottom:16px">${pricingHtml}${tagsHtml}</div>
-      <p class="modal-desc">${fullDesc}</p>
+      <div class="tags-row" style="margin-bottom:0">${pricingHtml}${tagsHtml}</div>
+      <hr class="modal-divider">
+      <div class="modal-desc-formatted">${formatDescription(fullDesc)}</div>
     </div>`
 
   document.getElementById('modal-footer').innerHTML = `
@@ -2565,6 +2693,23 @@ document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => { currentSearch = e.target.value; renderApps() }, 250)
 })
+// Category dropdown toggle
+const catBtn = document.getElementById('cat-dropdown-btn')
+const catPanel = document.getElementById('cat-dropdown-panel')
+if (catBtn) {
+  catBtn.addEventListener('click', function(e) {
+    e.stopPropagation()
+    const isOpen = catPanel.classList.toggle('open')
+    catBtn.classList.toggle('open', isOpen)
+  })
+}
+document.addEventListener('click', function(e) {
+  if (catPanel && !catPanel.contains(e.target) && catBtn && !catBtn.contains(e.target)) {
+    catPanel.classList.remove('open')
+    if (catBtn) catBtn.classList.remove('open')
+  }
+})
+
 // Random app button
 document.getElementById('btn-random').addEventListener('click', function() {
   if (!allApps.length) return
