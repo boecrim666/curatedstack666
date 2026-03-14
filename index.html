@@ -153,10 +153,25 @@
     [data-theme="win95"] .navbar {
       background: #c0c0c0 !important;
       backdrop-filter: none !important;
-      border-bottom: 2px solid !important;
-      border-color: #ffffff #808080 #808080 #ffffff !important;
-      padding: 4px 8px !important;
+      border-bottom: 2px solid #808080 !important;
+      flex-direction: column !important;
     }
+    [data-theme="win95"] .navbar-top {
+      background: #c0c0c0; padding: 4px 8px; height: auto; gap: 6px;
+    }
+    [data-theme="win95"] .navbar-cats {
+      background: #c0c0c0; padding: 4px 8px; border-top: 1px solid #808080;
+    }
+    [data-theme="win95"] .navbar-search .search-input {
+      border: 2px inset #808080 !important; border-radius: 0 !important;
+      background: white !important; color: black !important; font-family: 'Fixedsys', monospace !important;
+    }
+    [data-theme="win95"] .btn-random {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      color: #000 !important; font-family: 'Fixedsys', monospace !important; height: 26px !important;
+    }
+    [data-theme="win95"] .btn-random:hover { background: #d0d0d0 !important; }
     [data-theme="win95"] .navbar-brand { color: #000 !important; font-family: Arial, sans-serif !important; }
     [data-theme="win95"] .brand-gradient {
       background: none !important;
@@ -184,16 +199,6 @@
 
     [data-theme="win95"] .hero { display: none !important; }
 
-    [data-theme="win95"] .filter-bar {
-      max-width: 100% !important;
-      background: #c0c0c0;
-      border: 2px solid;
-      border-color: #ffffff #808080 #808080 #ffffff;
-      padding: 6px 10px;
-      margin-bottom: 16px !important;
-      border-radius: 0 !important;
-      gap: 8px;
-    }
     [data-theme="win95"] .search-input {
       background: #fff !important;
       border: 2px inset #808080 !important;
@@ -235,23 +240,23 @@
     /* ══════════════════════════════════════════
        NAVBAR
     ══════════════════════════════════════════ */
+    /* ── NAVBAR ── */
     .navbar {
-      position: sticky;
-      top: 0; z-index: 100;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      position: sticky; top: 0; z-index: 100;
       background: var(--nav-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--glass-border);
       transition: background var(--trans), border-color 0.3s;
+      display: flex; flex-direction: column;
+    }
+    .navbar-top {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 20px; height: 54px;
     }
     .navbar-brand {
       display: flex; align-items: center; gap: 8px;
       font-weight: 700; font-size: 17px; letter-spacing: -0.3px;
-      color: var(--text); text-decoration: none;
+      color: var(--text); text-decoration: none; flex-shrink: 0;
     }
     .navbar-brand img { height: 28px; width: auto; max-width: 52px; object-fit: contain; }
     .brand-gradient {
@@ -260,9 +265,56 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+    .navbar-search {
+      flex: 1; min-width: 0; max-width: 420px;
+    }
+    .navbar-search .search-wrap {
+      position: relative; display: flex; align-items: center;
+    }
+    .navbar-search .search-icon {
+      position: absolute; left: 10px; font-size: 15px; color: var(--text-faint); pointer-events: none;
+    }
+    .navbar-search .search-input {
+      width: 100%; height: 34px; padding: 0 12px 0 32px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); color: var(--text); font-family: var(--font); font-size: 13px;
+      outline: none; transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    .navbar-search .search-input:focus {
+      border-color: rgba(var(--accent-rgb),0.5);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.10);
+    }
+    .navbar-search .search-input::placeholder { color: var(--text-faint); }
+    .navbar-controls {
+      display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0;
+    }
+    .navbar-cats {
+      padding: 6px 20px 8px;
+      border-top: 1px solid var(--glass-border);
+    }
     .navbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
     .navbar-stats { display: flex; gap: 20px; font-size: 12px; color: var(--text-muted); }
     .navbar-stats strong { color: var(--text); font-weight: 600; }
+
+    /* Random button */
+    .btn-random {
+      height: 34px; padding: 0 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-muted); font-family: var(--font); font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      transition: all var(--trans);
+    }
+    .btn-random:hover {
+      border-color: rgba(var(--accent-rgb),0.5);
+      background: rgba(var(--accent-rgb),0.08);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(var(--accent-rgb),0.15);
+      transform: translateY(-1px);
+    }
+    .btn-random:active { transform: scale(0.96); }
 
     /* Theme toggle — pill */
     .theme-toggle {
@@ -438,49 +490,61 @@
 
 
     /* ══════════════════════════════════════════
-       FILTER BAR
+       FILTER BAR (moved to navbar)
     ══════════════════════════════════════════ */
-    .filter-bar {
-      display: flex; flex-direction: column; gap: 10px;
-      max-width: 760px; margin: 0 auto 44px;
-      animation: fadeSlideUp 0.6s 0.1s cubic-bezier(.22,1,.36,1) both;
-    }
-    .filter-row-top {
-      display: flex; gap: 12px; align-items: center;
-    }
 
     /* Category pills row */
     .cat-pills-row {
-      display: flex; flex-wrap: wrap; gap: 6px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 4px 0;
     }
     .cat-pill {
       flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
       font-size: 12px; font-weight: 500;
-      padding: 5px 14px; border-radius: 100px;
+      padding: 6px 14px; border-radius: 100px;
       border: 1px solid var(--glass-border);
       background: var(--glass-bg);
       color: var(--text-muted);
       cursor: pointer; white-space: nowrap;
       transition: all var(--trans);
       font-family: var(--font);
+      position: relative; overflow: hidden;
     }
+    .cat-pill::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(var(--accent-rgb),0.15) 0%, transparent 70%);
+      opacity: 0; transition: opacity var(--trans); pointer-events: none;
+    }
+    .cat-pill:hover::before { opacity: 1; }
     .cat-pill:hover {
-      border-color: rgba(var(--accent-rgb),0.40);
-      color: var(--accent); background: rgba(var(--accent-rgb),0.07);
+      border-color: rgba(var(--accent-rgb),0.45);
+      color: var(--accent);
+      background: rgba(var(--accent-rgb),0.07);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb),0.12);
     }
     .cat-pill.active {
       background: rgba(var(--accent-rgb),0.14);
-      border-color: rgba(var(--accent-rgb),0.50);
+      border-color: rgba(var(--accent-rgb),0.55);
       color: var(--accent); font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),0.20), 0 4px 14px rgba(var(--accent-rgb),0.15);
     }
-    [data-theme="terminal"] .cat-pill { font-family: var(--font) !important; border-radius: 2px !important; }
+    .cat-pill .cat-icon { font-size: 13px; line-height: 1; }
+    .cat-pill .cat-count {
+      font-size: 10px; font-weight: 700;
+      background: rgba(var(--accent-rgb),0.15);
+      border: 1px solid rgba(var(--accent-rgb),0.20);
+      color: var(--accent); padding: 1px 6px; border-radius: 100px;
+      min-width: 20px; text-align: center;
+      transition: background var(--trans);
+    }
+    .cat-pill.active .cat-count {
+      background: rgba(var(--accent-rgb),0.25);
+      border-color: rgba(var(--accent-rgb),0.40);
+    }
+    [data-theme="terminal"] .cat-pill { border-radius: 2px !important; }
     [data-theme="win95"] .cat-pills-row { display: none; }
-    .search-wrap { flex: 1; min-width: 200px; position: relative; }
-    .search-icon {
-      position: absolute; left: 14px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted); font-size: 16px; pointer-events: none;
-    }
     .search-input {
       width: 100%;
       padding: 11px 16px 11px 40px;
@@ -729,6 +793,68 @@
     .btn:hover { background: var(--glass-bg-h); border-color: rgba(255,255,255,0.20); color: var(--text); transform: translateY(-1px); }
     .btn:active { transform: translateY(0) scale(0.97); }
     .btn.upvoted { background: rgba(var(--accent-rgb),0.16); border-color: rgba(var(--accent-rgb),0.42); color: var(--accent); }
+
+    /* ── UPVOTE BUTTON ── */
+    .upvote-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font); font-size: 12px; font-weight: 700;
+      padding: 7px 16px; border-radius: var(--radius-md);
+      border: 1.5px solid rgba(var(--accent-rgb),0.30);
+      background: rgba(var(--accent-rgb),0.06);
+      color: var(--text-muted);
+      cursor: pointer; user-select: none;
+      transition: all var(--trans);
+      position: relative; overflow: hidden;
+      letter-spacing: 0.02em;
+    }
+    .upvote-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 120%, rgba(var(--accent-rgb),0.20) 0%, transparent 60%);
+      opacity: 0; transition: opacity var(--trans); pointer-events: none;
+    }
+    .upvote-btn:hover::before { opacity: 1; }
+    .upvote-btn:hover {
+      border-color: rgba(var(--accent-rgb),0.60);
+      color: var(--accent);
+      background: rgba(var(--accent-rgb),0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb),0.18);
+    }
+    .upvote-btn:active { transform: translateY(0) scale(0.96); }
+    .upvote-btn.upvoted {
+      background: rgba(var(--accent-rgb),0.18);
+      border-color: rgba(var(--accent-rgb),0.60);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),0.25), 0 4px 16px rgba(var(--accent-rgb),0.20);
+    }
+    .upvote-btn .upvote-arrow {
+      font-size: 16px; line-height: 1;
+      transition: transform var(--trans);
+      display: inline-block;
+    }
+    .upvote-btn:hover .upvote-arrow,
+    .upvote-btn.upvoted .upvote-arrow { transform: translateY(-2px); }
+    .upvote-btn .upvote-count { font-size: 13px; font-weight: 700; }
+    [data-theme="light"] .upvote-btn { border-color: rgba(var(--accent-rgb),0.25); }
+    [data-theme="terminal"] .upvote-btn {
+      background: transparent !important;
+      border-color: rgba(0,255,65,0.30) !important;
+      color: rgba(0,255,65,0.70) !important;
+      border-radius: 2px !important;
+      font-family: var(--font) !important;
+    }
+    [data-theme="terminal"] .upvote-btn:hover,
+    [data-theme="terminal"] .upvote-btn.upvoted {
+      background: rgba(0,255,65,0.10) !important;
+      border-color: rgba(0,255,65,0.60) !important;
+      color: #00ff41 !important;
+    }
+    [data-theme="win95"] .upvote-btn {
+      background: #c0c0c0 !important; border-radius: 0 !important;
+      border: 2px solid !important; border-color: #ffffff #808080 #808080 #ffffff !important;
+      color: #000 !important;
+    }
+    [data-theme="win95"] .upvote-btn.upvoted { background: navy !important; color: white !important; }
     .btn-primary {
       background: linear-gradient(135deg, rgba(16,185,129,0.70), rgba(52,211,153,0.50));
       border-color: rgba(var(--accent-rgb),0.50);
@@ -820,23 +946,13 @@
     .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
     .modal-section { margin-bottom: 20px; }
     .modal-desc { font-size: 14px; color: var(--text); line-height: 1.75; transition: color 0.3s; opacity: 0.88; }
-    .modal-avg {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; color: var(--text-muted);
-      background: var(--glass-bg); border: 1px solid var(--glass-border);
-      padding: 5px 12px; border-radius: 100px; margin-top: 8px;
-    }
-    .modal-avg .star { color: #fbbf24; }
+
     .modal-footer {
       padding: 16px 24px; border-top: 1px solid var(--glass-border);
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px; flex-shrink: 0; flex-wrap: wrap;
     }
-    .rate-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-faint); margin-bottom: 4px; }
-    .star-group { display: flex; gap: 3px; }
-    .star-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-faint); transition: color 0.15s, transform 0.15s; padding: 0 1px; line-height: 1; }
-    .star-btn:hover { transform: scale(1.25) rotate(-5deg); }
-    .star-btn.filled { color: #fbbf24; }
+
 
     /* Visit CTA in modal footer */
     .modal-visit-link { text-decoration: none; }
@@ -861,6 +977,39 @@
       .modal-header { padding: 16px; }
       .modal-body { padding: 16px; }
     }
+
+    /* ── MODAL PULSE ANIMATION (dark + light only) ── */
+    @keyframes modalGlowPulse {
+      0%   { box-shadow: var(--sh-modal), 0 0 0 0 rgba(var(--accent-rgb),0.5); }
+      40%  { box-shadow: var(--sh-modal), 0 0 35px 8px rgba(var(--accent-rgb),0.22); }
+      80%  { box-shadow: var(--sh-modal), 0 0 55px 16px rgba(var(--accent-rgb),0.10); }
+      100% { box-shadow: var(--sh-modal), 0 0 0 0 rgba(var(--accent-rgb),0.0); }
+    }
+    @keyframes modalTopSweep {
+      0%   { transform: translateX(-150%); opacity: 0; }
+      8%   { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(250%); opacity: 0; }
+    }
+    @keyframes modalCornerPulse {
+      0%   { border-color: rgba(var(--accent-rgb),0.55); }
+      60%  { border-color: rgba(var(--accent-rgb),0.15); }
+      100% { border-color: rgba(var(--accent-rgb),0.0); }
+    }
+    [data-theme="dark"] .modal-overlay.active .modal,
+    [data-theme="light"] .modal-overlay.active .modal {
+      animation: modalGlowPulse 2.4s cubic-bezier(0.4,0,0.6,1) 1;
+    }
+    [data-theme="dark"] .modal-overlay.active .modal::before,
+    [data-theme="light"] .modal-overlay.active .modal::before {
+      animation: modalTopSweep 1.6s cubic-bezier(0.4,0,0.2,1) 0.15s 1 both;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb),0.9) 30%, rgba(255,255,255,0.7) 50%, rgba(var(--accent-rgb),0.9) 70%, transparent 100%);
+    }
+    [data-theme="win95"] .modal-overlay.active .modal,
+    [data-theme="terminal"] .modal-overlay.active .modal { animation: none !important; }
+    [data-theme="win95"] .modal-overlay.active .modal::before,
+    [data-theme="terminal"] .modal-overlay.active .modal::before { animation: none !important; }
 
     /* WIN95 modal overrides */
     [data-theme="win95"] .modal {
@@ -893,9 +1042,6 @@
     [data-theme="win95"] .modal-desc { color: #000 !important; font-family: Arial, sans-serif !important; font-size: 12px !important; }
     [data-theme="win95"] .modal-footer { background: #c0c0c0; border-top: 2px solid #808080 !important; }
     [data-theme="win95"] .modal-avg { background: #e0e0e0 !important; border: 1px inset #808080 !important; color: #000 !important; }
-    [data-theme="win95"] .rate-label { color: #000 !important; font-family: Arial, sans-serif !important; }
-    [data-theme="win95"] .star-btn { color: #808080 !important; }
-    [data-theme="win95"] .star-btn.filled { color: #ffaa00 !important; }
     [data-theme="win95"] .btn-primary {
       background: #c0c0c0 !important;
       border: 2px solid !important;
@@ -947,7 +1093,7 @@
     .list-view { display: flex; flex-direction: column; gap: 6px; }
     .list-row {
       display: grid;
-      grid-template-columns: 36px 1fr 100px auto auto 56px 56px;
+      grid-template-columns: 36px 1fr 100px auto auto 56px;
       align-items: center; gap: 14px;
       padding: 10px 16px;
       background: var(--glass-bg);
@@ -963,41 +1109,89 @@
     .list-sub  { font-size: 11px; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .list-cat  { font-size: 11px; color: var(--accent); background: rgba(var(--accent-rgb),.12); padding: 3px 9px; border-radius: 999px; text-align: center; white-space: nowrap; }
     .list-tags { display: flex; gap: 4px; flex-wrap: wrap; overflow: hidden; }
-    .list-upvotes, .list-rating { font-size: 12px; color: var(--text-muted); white-space: nowrap; text-align: right; }
+    .list-upvotes { font-size: 12px; color: var(--text-muted); white-space: nowrap; text-align: right; }
     @media (max-width: 700px) {
       .list-row { grid-template-columns: 32px 1fr auto; }
-      .list-cat, .list-tags, .list-upvotes, .list-rating { display: none; }
+      .list-cat, .list-tags, .list-upvotes { display: none; }
     }
 
     /* ══════════════════════════════════════════
-       TABLE VIEW
+       LEADERBOARD VIEW
     ══════════════════════════════════════════ */
-    .table-wrap {
-      overflow-x: auto; border-radius: var(--radius-lg);
+    .leaderboard-wrap { max-width: 740px; margin: 0 auto; }
+    .leaderboard-header {
+      text-align: center; margin-bottom: 32px;
+      padding: 28px 24px;
+      background: rgba(var(--accent-rgb),0.05);
+      border: 1px solid rgba(var(--accent-rgb),0.15);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(var(--blur));
+    }
+    .leaderboard-header h2 {
+      font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 6px;
+    }
+    .leaderboard-header p { font-size: 13px; color: var(--text-muted); }
+    .leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 44px 44px 1fr auto auto;
+      align-items: center; gap: 14px;
+      padding: 14px 18px;
+      background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--trans);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      position: relative; overflow: hidden;
     }
-    table.table-view { width: 100%; border-collapse: collapse; font-size: 14px; }
-    table.table-view thead tr { background: rgba(var(--accent-rgb),.06); border-bottom: 1px solid var(--glass-border); }
-    table.table-view th {
-      padding: 13px 16px; text-align: left; font-weight: 600;
-      font-size: 11px; text-transform: uppercase; letter-spacing: .6px;
-      color: var(--text-muted); white-space: nowrap;
-      cursor: pointer; user-select: none; transition: color var(--trans);
+    .leaderboard-row::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: var(--accent); opacity: 0;
+      transition: opacity var(--trans);
     }
-    table.table-view th:hover { color: var(--accent); }
-    table.table-view th.th-sorted { color: var(--accent); }
-    table.table-view td { padding: 10px 16px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
-    table.table-view tbody tr { cursor: pointer; transition: background var(--trans); }
-    table.table-view tbody tr:hover { background: var(--glass-bg); }
-    table.table-view tbody tr:last-child td { border-bottom: none; }
-    .tbl-name { font-weight: 600; font-size: 14px; }
-    .tbl-sub  { font-size: 11px; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; margin-top: 2px; }
-    .sort-arrow { opacity: .35; font-size: 10px; margin-left: 3px; }
-    .th-sorted .sort-arrow { opacity: 1; }
-    [data-theme="win95"] table.table-view { font-family: Arial, sans-serif !important; }
-    [data-theme="win95"] table.table-view th { font-family: Arial, sans-serif !important; background: #c0c0c0 !important; color: #000 !important; }
-    [data-theme="win95"] table.table-view tbody tr:hover { background: navy !important; color: #fff !important; }
+    .leaderboard-row:hover { background: var(--glass-bg-h); border-color: var(--glass-bdr-h); box-shadow: var(--sh-hover); }
+    .leaderboard-row:hover::before { opacity: 1; }
+    .leaderboard-row.top-1 { border-color: rgba(255,215,0,0.30); background: rgba(255,215,0,0.04); }
+    .leaderboard-row.top-2 { border-color: rgba(192,192,192,0.30); background: rgba(192,192,192,0.04); }
+    .leaderboard-row.top-3 { border-color: rgba(205,127,50,0.30); background: rgba(205,127,50,0.04); }
+    .leaderboard-row.top-1::before { background: #ffd700; opacity: 1; }
+    .leaderboard-row.top-2::before { background: #c0c0c0; opacity: 1; }
+    .leaderboard-row.top-3::before { background: #cd7f32; opacity: 1; }
+    .lb-rank { font-size: 18px; font-weight: 900; text-align: center; color: var(--text-faint); }
+    .leaderboard-row.top-1 .lb-rank { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.4); font-size: 22px; }
+    .leaderboard-row.top-2 .lb-rank { color: #c0c0c0; font-size: 20px; }
+    .leaderboard-row.top-3 .lb-rank { color: #cd7f32; font-size: 20px; }
+    .lb-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); object-fit: contain; border: 1px solid var(--glass-border); }
+    .lb-info { min-width: 0; }
+    .lb-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-cat { font-size: 11px; color: var(--accent); margin-top: 2px; }
+    .lb-votes {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      background: rgba(var(--accent-rgb),0.10); border: 1px solid rgba(var(--accent-rgb),0.22);
+      border-radius: var(--radius-md); padding: 8px 14px; min-width: 60px; text-align: center;
+    }
+    .lb-votes-arrow { font-size: 18px; color: var(--accent); line-height: 1; }
+    .lb-votes-num { font-size: 16px; font-weight: 800; color: var(--accent); line-height: 1; }
+    .lb-upvote-btn {
+      background: transparent; border: 1.5px solid rgba(var(--accent-rgb),0.30);
+      color: var(--text-muted); border-radius: var(--radius-md);
+      padding: 8px 14px; cursor: pointer; font-family: var(--font);
+      font-size: 12px; font-weight: 600;
+      transition: all var(--trans); white-space: nowrap;
+    }
+    .lb-upvote-btn:hover { background: rgba(var(--accent-rgb),0.12); border-color: rgba(var(--accent-rgb),0.55); color: var(--accent); }
+    .lb-upvote-btn.upvoted { background: rgba(var(--accent-rgb),0.18); border-color: rgba(var(--accent-rgb),0.60); color: var(--accent); }
+    [data-theme="terminal"] .leaderboard-row { border-radius: 4px !important; }
+    [data-theme="terminal"] .leaderboard-header h2 { -webkit-text-fill-color: #00ff41 !important; text-shadow: 0 0 14px rgba(0,255,65,0.5) !important; }
+    @media (max-width: 600px) {
+      .leaderboard-row { grid-template-columns: 36px 36px 1fr auto; }
+      .lb-upvote-btn { display: none; }
+    }
 
     /* ══════════════════════════════════════════
        KANBAN / BOARD VIEW
@@ -1337,13 +1531,28 @@
       background: rgba(0,10,4,0.93) !important;
       backdrop-filter: blur(12px) !important;
     }
-    [data-theme="terminal"] .filter-bar,
     [data-theme="terminal"] .search-input,
     [data-theme="terminal"] .cat-pills-row {
       position: relative; z-index: 2;
     }
     [data-theme="terminal"] #app-container { position: relative; z-index: 2; }
     [data-theme="terminal"] .navbar { z-index: 101; }
+    [data-theme="terminal"] .navbar-search .search-input {
+      background: rgba(0,255,65,0.05) !important;
+      border-color: rgba(0,255,65,0.25) !important;
+      color: #00ff41 !important; font-family: 'Courier New', monospace !important;
+      border-radius: 2px !important;
+    }
+    [data-theme="terminal"] .navbar-search .search-input::placeholder { color: rgba(0,255,65,0.35) !important; }
+    [data-theme="terminal"] .btn-random {
+      background: transparent !important; border-color: rgba(0,255,65,0.30) !important;
+      color: rgba(0,255,65,0.70) !important; border-radius: 2px !important;
+      font-family: 'Courier New', monospace !important;
+    }
+    [data-theme="terminal"] .btn-random:hover {
+      background: rgba(0,255,65,0.10) !important; border-color: rgba(0,255,65,0.60) !important;
+      color: #00ff41 !important;
+    }
     [data-theme="terminal"] .hero { position: relative; z-index: 2; }
 
     /* ══════════════════════════════════════════
@@ -1353,8 +1562,7 @@
     #app-container { position: relative; }
 
     /* List/kanban/timeline start invisible — Motion One animates them in */
-    .list-row, .kanban-col, .timeline-item,
-    table.table-view tbody tr {
+    .list-row, .kanban-col, .timeline-item {
       opacity: 0;
       /* Failsafe: auto-show after 1.5s if Motion fails to load */
       animation: motionFallback 0s 1.5s forwards;
@@ -1389,9 +1597,14 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb),0.20); border-radius: 3px; }
 
+    @media (max-width: 900px) {
+      .navbar-search { max-width: 220px; }
+      .btn-random span { display: none; }
+    }
     @media (max-width: 640px) {
       .navbar-stats { display: none; }
-      .filter-bar { flex-direction: column; }
+      .navbar-search { display: none; }
+      .btn-random { display: none; }
       .filter-select { width: 100%; }
       .app-grid, .skeleton-grid { grid-template-columns: 1fr; }
       .modal-footer { flex-direction: column; align-items: flex-start; }
@@ -1420,18 +1633,37 @@
 
 <!-- ── NAVBAR ──────────────────────────────────── -->
 <nav class="navbar">
-  <a class="navbar-brand" href="#">
-    <img src="logo-dark.png" alt="CuratedStack" id="nav-logo">
-    <span class="brand-gradient">CuratedStack</span>
-  </a>
-  <div class="navbar-right">
-    <a class="btn-submit-app" id="btn-submit" data-magnetic href="mailto:jarvisclawisopen@gmail.com?subject=Submit%20App%20to%20CuratedStack" title="Submit an app">
-      <span>+</span><span>Submit app</span>
+  <div class="navbar-top">
+    <a class="navbar-brand" href="#">
+      <img src="logo-dark.png" alt="CuratedStack" id="nav-logo">
+      <span class="brand-gradient">CuratedStack</span>
     </a>
-    <button class="theme-toggle" id="theme-toggle" data-magnetic aria-label="Switch theme">
-      <span class="t-icon" id="t-icon">🌙</span>
-      <span class="t-label" id="t-label">Dark</span>
-    </button>
+    <div class="navbar-search">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
+      </div>
+    </div>
+    <div class="navbar-controls">
+      <div class="view-switcher" id="view-switcher">
+        <button class="view-btn" data-view="grid"        title="Grid">⊞</button>
+        <button class="view-btn" data-view="list"        title="List">≡</button>
+        <button class="view-btn" data-view="kanban"      title="Board">⋮⋮</button>
+        <button class="view-btn" data-view="timeline"    title="Timeline">◎</button>
+        <button class="view-btn" data-view="leaderboard" title="Leaderboard">🏆</button>
+      </div>
+      <button class="btn-random" id="btn-random" title="Open a random app">🎲 Random</button>
+      <a class="btn-submit-app" id="btn-submit" data-magnetic href="mailto:jarvisclawisopen@gmail.com?subject=Submit%20App%20to%20CuratedStack" title="Submit an app">
+        <span>+</span><span>Submit app</span>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" data-magnetic aria-label="Switch theme">
+        <span class="t-icon" id="t-icon">🌙</span>
+        <span class="t-label" id="t-label">Dark</span>
+      </button>
+    </div>
+  </div>
+  <div class="navbar-cats">
+    <div class="cat-pills-row" id="cat-pills"></div>
   </div>
 </nav>
 
@@ -1460,28 +1692,6 @@
       </div>
     </div>
 
-    <a class="btn-submit-app" style="margin: 0 auto; display:inline-flex;" href="mailto:submit@curatedstack.com?subject=Submit%20App">
-      <span>✦</span><span>Submit your app</span>
-    </a>
-  </div>
-
-  <div class="filter-bar">
-    <div class="filter-row-top">
-      <div class="search-wrap">
-        <span class="search-icon">⌕</span>
-        <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
-      </div>
-      <div class="view-switcher" id="view-switcher">
-        <button class="view-btn" data-view="grid"     title="Grid">⊞</button>
-        <button class="view-btn" data-view="list"     title="List">≡</button>
-        <button class="view-btn" data-view="table"    title="Table">⊟</button>
-        <button class="view-btn" data-view="kanban"   title="Board">⋮⋮</button>
-        <button class="view-btn" data-view="timeline" title="Timeline">◎</button>
-      </div>
-    </div>
-    <div class="cat-pills-row" id="cat-pills">
-      <button class="cat-pill active" onclick="setCat('all')">All</button>
-    </div>
   </div>
 
   <div id="app-container">
@@ -1528,7 +1738,7 @@ let allApps = []
 let currentCategory = 'all'
 let currentSearch   = ''
 let currentView     = localStorage.getItem('cs-view') || 'grid'
-let sortCol = 'name', sortDir = 1
+if (currentView === 'table') currentView = 'grid'
 let kanbanIdx = 0
 let matrixRaf = null
 let matrixRunning = false
@@ -1620,21 +1830,50 @@ document.addEventListener('mousemove', e => {
 
 /* ─── HELPERS ─────────────────────────────── */
 /* ─── CATEGORY PILLS ──────────────────────── */
+const CATEGORY_ICONS = {
+  'AI': '🤖', 'AI Tools': '🤖', 'Artificial Intelligence': '🤖',
+  'Design': '🎨', 'UI/UX': '🎨', 'Design Tools': '🎨',
+  'Development': '💻', 'Dev Tools': '💻', 'Developer Tools': '💻', 'Coding': '💻',
+  'Productivity': '⚡', 'Productivity Tools': '⚡',
+  'Marketing': '📣', 'Marketing Tools': '📣', 'SEO': '📣',
+  'Analytics': '📊', 'Data': '📊', 'Data Analytics': '📊',
+  'Communication': '💬', 'Collaboration': '💬',
+  'Finance': '💰', 'Fintech': '💰', 'Crypto': '💰',
+  'Security': '🔒', 'Privacy': '🔒',
+  'Media': '🎬', 'Video': '🎬', 'Audio': '🎵',
+  'Education': '📚', 'Learning': '📚',
+  'Automation': '🔄', 'No-Code': '🔄',
+  'Social': '🌐', 'Community': '🌐',
+  'Storage': '☁️', 'Cloud': '☁️',
+  'CMS': '📝', 'Content': '📝',
+  'E-commerce': '🛒', 'Shopping': '🛒',
+  'Other': '✦',
+}
+
 function renderCatPills(cats) {
   const el = document.getElementById('cat-pills')
   if (!el) return
-  const all = `<button class="cat-pill ${currentCategory === 'all' ? 'active' : ''}" onclick="setCat('all')">All</button>`
-  const rest = cats.map(c =>
-    `<button class="cat-pill ${currentCategory === c ? 'active' : ''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">` + c + `</button>`
-  ).join('')
-  el.innerHTML = all + rest
+  const totalAll = allApps.length
+  const allPill = `<button class="cat-pill ${currentCategory === 'all' ? 'active' : ''}" onclick="setCat('all')">
+    <span class="cat-icon">✦</span>
+    <span>All</span>
+    <span class="cat-count">${totalAll}</span>
+  </button>`
+  const rest = cats.map(c => {
+    const count = allApps.filter(a => a.category === c).length
+    const icon = CATEGORY_ICONS[c] || '✦'
+    return `<button class="cat-pill ${currentCategory === c ? 'active' : ''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">
+      <span class="cat-icon">${icon}</span>
+      <span>${c}</span>
+      <span class="cat-count">${count}</span>
+    </button>`
+  }).join('')
+  el.innerHTML = allPill + rest
 }
 
 function setCat(cat) {
   currentCategory = cat
-  document.querySelectorAll('.cat-pill').forEach(b => {
-    b.classList.toggle('active', b.textContent === cat || (cat === 'all' && b.textContent === 'All'))
-  })
+  renderCatPills([...new Set(allApps.map(a => a.category).filter(Boolean))].sort())
   renderApps()
 }
 
@@ -1657,11 +1896,9 @@ function createCard(app, delay = 0) {
   if (theme === 'win95') return createCardWin95(app)
   if (theme === 'terminal') return createCardTerminal(app)
   const upvoted = !!localStorage.getItem(`upvoted_${app.id}`)
-  const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const favicon = app.logo_url || getFavicon(app.url)
   const pricing = app.pricing_model ? `<span class="tag pricing ${getPricingClass(app.pricing_model)}">${app.pricing_model}</span>` : ''
   const tags    = (app.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')
-  const rating  = avg ? `<span class="star">★</span>${avg}` : '<span style="opacity:.35">no ratings</span>'
   return `
     <div class="app-card ${app.featured ? 'featured' : ''}" data-id="${app.id}"
          style="animation-delay:${delay}ms" onclick="openModal('${app.id}')">
@@ -1680,9 +1917,10 @@ function createCard(app, delay = 0) {
       <p class="app-desc">${app.description || 'No description available.'}</p>
       <div class="tags-row">${pricing}${tags}</div>
       <div class="card-footer">
-        <button class="btn ${upvoted ? 'upvoted' : ''}"
-                onclick="event.stopPropagation();handleUpvote('${app.id}',this)">👍 <span>${app.upvotes||0}</span></button>
-        <div class="rating-display">${rating}</div>
+        <button class="upvote-btn ${upvoted ? 'upvoted' : ''}"
+                onclick="event.stopPropagation();handleUpvote('${app.id}',this)">
+          <span class="upvote-arrow">▲</span><span class="upvote-count">${app.upvotes||0}</span>
+        </button>
       </div>
     </div>`
 }
@@ -1690,7 +1928,6 @@ function createCard(app, delay = 0) {
 /* ─── WIN95 CARD ──────────────────────────── */
 function createCardWin95(app) {
   const upvoted = !!localStorage.getItem(`upvoted_${app.id}`)
-  const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const favicon = app.logo_url || getFavicon(app.url)
   const pc      = getPricingClass(app.pricing_model)
   const pricing = app.pricing_model
@@ -1712,9 +1949,8 @@ function createCardWin95(app) {
         <p style="font-size:11px;margin:0 0 6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${app.description || 'No description.'}</p>
         <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px">${pricing}${tags}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #808080;padding-top:6px">
-          <button class="win95-upvote-btn ${upvoted ? 'upvoted' : ''}"
-                  onclick="event.stopPropagation();handleUpvote('${app.id}',this)">👍 <span>${app.upvotes||0}</span></button>
-          <span style="font-size:11px;color:#444">${avg ? `★ ${avg}` : 'No ratings'}</span>
+          <button class="win95-upvote-btn upvote-btn ${upvoted ? 'upvoted' : ''}"
+                  onclick="event.stopPropagation();handleUpvote('${app.id}',this)">▲ <span class="upvote-count">${app.upvotes||0}</span></button>
         </div>
       </div>
     </div>`
@@ -1722,12 +1958,10 @@ function createCardWin95(app) {
 
 function createCardTerminal(app) {
   const upvoted = !!localStorage.getItem(`upvoted_${app.id}`)
-  const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const pc      = getPricingClass(app.pricing_model)
   const pricing = app.pricing_model
     ? `<span class="terminal-tag pricing">[${app.pricing_model.toUpperCase()}]</span>` : ''
   const tags = (app.tags || []).slice(0, 3).map(t => `<span class="terminal-tag">${t}</span>`).join('')
-  const rating = avg ? `★ ${avg}` : 'N/A'
   const pid = app.id.toString().padStart(4, '0')
   return `
     <div class="terminal-card" data-id="${app.id}" onclick="openModal('${app.id}')">
@@ -1743,11 +1977,10 @@ function createCardTerminal(app) {
         <div class="terminal-prompt">$ ls ./tags</div>
         <div class="terminal-tags">${pricing}${tags}</div>
         <div class="terminal-footer">
-          <button class="terminal-upvote-btn ${upvoted ? 'upvoted' : ''}"
+          <button class="terminal-upvote-btn upvote-btn ${upvoted ? 'upvoted' : ''}"
                   onclick="event.stopPropagation();handleUpvote('${app.id}',this)">
-            ^upvote [<span>${app.upvotes||0}</span>]
+            ▲ vote [<span class="upvote-count">${app.upvotes||0}</span>]
           </button>
-          <span class="terminal-rating">rating: ${rating}</span>
         </div>
       </div>
     </div>`
@@ -1772,9 +2005,7 @@ function openModal(id) {
   const app = allApps.find(a => a.id === id)
   if (!app) return
 
-  const userRating = parseInt(localStorage.getItem(`rated_${app.id}`)) || 0
   const hasUpvoted = !!localStorage.getItem(`upvoted_${app.id}`)
-  const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const favicon = app.logo_url || getFavicon(app.url)
   const pc      = getPricingClass(app.pricing_model)
   const fullDesc = app.detailed_description || app.description || 'No description available.'
@@ -1806,19 +2037,12 @@ function openModal(id) {
     <div class="modal-section">
       <div class="tags-row" style="margin-bottom:16px">${pricingHtml}${tagsHtml}</div>
       <p class="modal-desc">${fullDesc}</p>
-      ${avg ? `<div class="modal-avg"><span class="star">★</span><strong>${avg}</strong><span style="opacity:.6">· ${app.rating_count} reviews</span></div>` : ''}
     </div>`
 
   document.getElementById('modal-footer').innerHTML = `
-    <button class="btn ${hasUpvoted ? 'upvoted' : ''}" onclick="handleUpvote('${app.id}',this)">
-      👍 <span>${app.upvotes||0}</span>
+    <button class="upvote-btn ${hasUpvoted ? 'upvoted' : ''}" onclick="handleUpvote('${app.id}',this)">
+      <span class="upvote-arrow">▲</span><span class="upvote-count">${app.upvotes||0}</span>
     </button>
-    <div style="text-align:center">
-      <div class="rate-label">Rate this app</div>
-      <div class="star-group">
-        ${[1,2,3,4,5].map(i => `<button class="star-btn ${userRating>=i?'filled':''}" onclick="handleRating('${app.id}',${i},this)">${userRating>=i?'★':'☆'}</button>`).join('')}
-      </div>
-    </div>
     <a href="${app.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="modal-visit-link">
       <button class="btn btn-primary modal-visit-btn">Visit site →</button>
     </a>`
@@ -1826,6 +2050,14 @@ function openModal(id) {
   const overlay = document.getElementById('modal-overlay')
   overlay.classList.add('active')
   document.body.style.overflow = 'hidden'
+
+  // Reset modal animation for each open
+  const modalEl = document.getElementById('modal')
+  if (modalEl && (theme === 'dark' || theme === 'light')) {
+    modalEl.style.animation = 'none'
+    void modalEl.offsetHeight  // force reflow
+    modalEl.style.animation = ''
+  }
 }
 
 function closeModal() {
@@ -1843,18 +2075,25 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 /* ─── UPVOTE ──────────────────────────────── */
 async function handleUpvote(appId, btn) {
   if (localStorage.getItem(`upvoted_${appId}`)) return
-  const span = btn.querySelector('span')
+  const span = btn.querySelector('.upvote-count') || btn.querySelector('span')
   btn.style.transform = 'scale(1.2)'
   setTimeout(() => btn.style.transform = '', 200)
-  span.textContent = parseInt(span.textContent) + 1
+  if (span) span.textContent = parseInt(span.textContent) + 1
   btn.classList.add('upvoted')
   localStorage.setItem(`upvoted_${appId}`, '1')
   const app = allApps.find(a => a.id === appId)
   if (app) app.upvotes++
-  document.querySelectorAll(`[data-id="${appId}"] .btn, [data-id="${appId}"] .win95-upvote-btn`).forEach(b => {
+  document.querySelectorAll(`[data-id="${appId}"] .upvote-btn, [data-id="${appId}"] .win95-upvote-btn, [data-id="${appId}"] .terminal-upvote-btn`).forEach(b => {
     b.classList.add('upvoted')
-    const s = b.querySelector('span'); if (s && app) s.textContent = app.upvotes
+    const s = b.querySelector('.upvote-count') || b.querySelector('span')
+    if (s && app) s.textContent = app.upvotes
   })
+  // Update leaderboard view if visible
+  const lbEl = document.getElementById(`lb-votes-${appId}`)
+  if (lbEl && app) lbEl.textContent = app.upvotes
+  // Update lb-upvote-btn text
+  const lbBtn = document.querySelector(`.lb-upvote-btn[onclick*="${appId}"]`)
+  if (lbBtn) { lbBtn.classList.add('upvoted'); lbBtn.textContent = '✓ Voted' }
   updateStats()
   fetch(`${SUPABASE_URL}/rest/v1/votes`, {
     method: 'POST',
@@ -1863,25 +2102,7 @@ async function handleUpvote(appId, btn) {
   }).catch(() => {})
 }
 
-/* ─── RATING ──────────────────────────────── */
-async function handleRating(appId, rating, btn) {
-  if (localStorage.getItem(`rated_${appId}`)) return
-  const stars = btn.parentElement.querySelectorAll('.star-btn')
-  stars.forEach((s, i) => {
-    s.textContent = i < rating ? '★' : '☆'
-    s.classList.toggle('filled', i < rating)
-    setTimeout(() => { s.style.transform = 'scale(1.3)'; setTimeout(() => s.style.transform = '', 180) }, i * 50)
-  })
-  localStorage.setItem(`rated_${appId}`, rating)
-  const app = allApps.find(a => a.id === appId)
-  if (app) { app.rating_sum += rating; app.rating_count++ }
-  updateStats()
-  fetch(`${SUPABASE_URL}/rest/v1/votes`, {
-    method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ app_id: appId, user_fingerprint: 'u-'+Math.random().toString(36).substr(2,9), vote_type: 'rating', rating_value: rating })
-  }).catch(() => {})
-}
+
 
 /* ─── VIEW SWITCHER ───────────────────────── */
 function setView(v) {
@@ -1894,7 +2115,6 @@ function setView(v) {
 /* ─── LIST VIEW ───────────────────────────── */
 function createListRow(app, delay) {
   const favicon = app.logo_url || getFavicon(app.url)
-  const avg  = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
   const pc   = getPricingClass(app.pricing_model)
   const tags = (app.tags || []).slice(0, 3).map(t => `<span class="tag" style="font-size:11px;padding:2px 7px">${t}</span>`).join('')
   const desc = (app.description || '').slice(0, 65) + ((app.description || '').length > 65 ? '…' : '')
@@ -1908,76 +2128,11 @@ function createListRow(app, delay) {
       <div class="list-cat">${app.category || 'Other'}</div>
       <div class="list-tags">${tags}</div>
       ${app.pricing_model ? `<span class="tag pricing ${pc}" style="font-size:11px">${app.pricing_model}</span>` : '<span></span>'}
-      <div class="list-upvotes">👍 ${app.upvotes || 0}</div>
-      <div class="list-rating">${avg ? `★ ${avg}` : '—'}</div>
+      <div class="list-upvotes">▲ ${app.upvotes || 0}</div>
     </div>`
 }
 
-/* ─── TABLE VIEW ──────────────────────────── */
-function tableSort(col) {
-  sortDir = sortCol === col ? -sortDir : 1
-  sortCol = col
-  renderApps()
-}
 
-function renderTableView(apps) {
-  function getVal(a, col) {
-    if (col === 'name')     return (a.name || '').toLowerCase()
-    if (col === 'category') return (a.category || '').toLowerCase()
-    if (col === 'pricing')  return (a.pricing_model || '').toLowerCase()
-    if (col === 'upvotes')  return a.upvotes || 0
-    if (col === 'rating')   return a.rating_count > 0 ? a.rating_sum / a.rating_count : -1
-    return ''
-  }
-  const sorted = [...apps].sort((a, b) => {
-    const va = getVal(a, sortCol), vb = getVal(b, sortCol)
-    return va < vb ? -sortDir : va > vb ? sortDir : 0
-  })
-  function thCls(col) { return sortCol === col ? 'th-sorted' : '' }
-  function arr(col) {
-    if (col !== sortCol) return `<span class="sort-arrow">↕</span>`
-    return `<span class="sort-arrow">${sortDir > 0 ? '↑' : '↓'}</span>`
-  }
-  const rows = sorted.map(app => {
-    const favicon = app.logo_url || getFavicon(app.url)
-    const avg     = app.rating_count > 0 ? (app.rating_sum / app.rating_count).toFixed(1) : null
-    const pc      = getPricingClass(app.pricing_model)
-    const tags    = (app.tags || []).slice(0, 3).map(t => `<span class="tag" style="font-size:11px;padding:2px 6px">${t}</span>`).join('')
-    return `
-      <tr onclick="openModal('${app.id}')">
-        <td>
-          <div style="display:flex;align-items:center;gap:10px">
-            <img src="${favicon}" style="width:28px;height:28px;border-radius:7px;object-fit:contain;flex-shrink:0" onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}">
-            <div>
-              <div class="tbl-name">${app.name}</div>
-              <div class="tbl-sub">${app.description || ''}</div>
-            </div>
-          </div>
-        </td>
-        <td><span style="color:var(--accent);font-size:13px">${app.category || '—'}</span></td>
-        <td>${app.pricing_model ? `<span class="tag pricing ${pc}" style="font-size:11px">${app.pricing_model}</span>` : '—'}</td>
-        <td><div style="display:flex;gap:4px;flex-wrap:wrap">${tags}</div></td>
-        <td style="color:var(--text-muted);text-align:right">${app.upvotes || 0}</td>
-        <td style="color:var(--text-muted);text-align:right">${avg ? `★ ${avg}` : '—'}</td>
-      </tr>`
-  }).join('')
-  return `
-    <div class="table-wrap">
-      <table class="table-view">
-        <thead>
-          <tr>
-            <th class="${thCls('name')}"     onclick="tableSort('name')">App ${arr('name')}</th>
-            <th class="${thCls('category')}" onclick="tableSort('category')">Category ${arr('category')}</th>
-            <th class="${thCls('pricing')}"  onclick="tableSort('pricing')">Pricing ${arr('pricing')}</th>
-            <th>Tags</th>
-            <th class="${thCls('upvotes')}"  onclick="tableSort('upvotes')" style="text-align:right">👍 ${arr('upvotes')}</th>
-            <th class="${thCls('rating')}"   onclick="tableSort('rating')"  style="text-align:right">★ ${arr('rating')}</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`
-}
 
 /* ─── KANBAN / BOARD VIEW ─────────────────── */
 function kanbanScroll(dir) {
@@ -2019,7 +2174,7 @@ function renderKanbanView(filtered) {
           <div class="kanban-card-desc">${app.description || ''}</div>
           <div class="kanban-card-footer">
             ${app.pricing_model ? `<span class="tag pricing ${pc}" style="font-size:10px;padding:1px 6px">${app.pricing_model}</span>` : '<span></span>'}
-            <span>👍 ${app.upvotes || 0}</span>
+            <span>▲ ${app.upvotes || 0}</span>
           </div>
         </div>`
     }).join('')
@@ -2093,6 +2248,42 @@ function renderTimelineView(filtered) {
   return `<div class="timeline-view">${monthsHtml}</div>`
 }
 
+/* ─── LEADERBOARD VIEW ────────────────────── */
+function renderLeaderboardView(apps) {
+  const sorted = [...apps].sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0))
+  const topClass = (i) => i === 0 ? 'top-1' : i === 1 ? 'top-2' : i === 2 ? 'top-3' : ''
+  const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`
+  const rows = sorted.map((app, i) => {
+    const favicon = app.logo_url || getFavicon(app.url)
+    const hasUpvoted = !!localStorage.getItem(`upvoted_${app.id}`)
+    return `
+      <div class="leaderboard-row ${topClass(i)}" onclick="openModal('${app.id}')">
+        <div class="lb-rank">${medal(i)}</div>
+        <img class="lb-icon" src="${favicon}" alt="${app.name}" onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}">
+        <div class="lb-info">
+          <div class="lb-name">${app.name}</div>
+          <div class="lb-cat">${app.category || 'Other'}</div>
+        </div>
+        <div class="lb-votes">
+          <span class="lb-votes-arrow">▲</span>
+          <span class="lb-votes-num" id="lb-votes-${app.id}">${app.upvotes || 0}</span>
+        </div>
+        <button class="lb-upvote-btn ${hasUpvoted ? 'upvoted' : ''}" onclick="event.stopPropagation();handleUpvote('${app.id}',this)">
+          ${hasUpvoted ? '✓ Voted' : '▲ Vote'}
+        </button>
+      </div>`
+  }).join('')
+  const total = apps.reduce((s, a) => s + (a.upvotes || 0), 0)
+  return `
+    <div class="leaderboard-wrap">
+      <div class="leaderboard-header">
+        <h2>🏆 Leaderboard</h2>
+        <p>${apps.length} apps · ${total} total votes cast by the community</p>
+      </div>
+      <div class="leaderboard-list">${rows}</div>
+    </div>`
+}
+
 /* ─── RENDER ──────────────────────────────── */
 function renderApps() {
   const container = document.getElementById('app-container')
@@ -2127,8 +2318,19 @@ function renderApps() {
   if (currentView === 'list') {
     container.innerHTML = `<div class="list-view">${filtered.map((a, i) => createListRow(a, i * 25)).join('')}</div>`
 
-  } else if (currentView === 'table') {
-    container.innerHTML = renderTableView(filtered)
+  } else if (currentView === 'leaderboard') {
+    container.innerHTML = renderLeaderboardView(filtered)
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.leaderboard-row').forEach((el, i) => {
+        el.style.opacity = '0'
+        el.style.transform = 'translateX(-16px)'
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(.22,1,.36,1)'
+          el.style.opacity = '1'
+          el.style.transform = 'translateX(0)'
+        }, i * 35)
+      })
+    })
 
   } else if (currentView === 'kanban') {
     container.innerHTML = renderKanbanView(filtered)
@@ -2228,6 +2430,12 @@ let searchTimer
 document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => { currentSearch = e.target.value; renderApps() }, 250)
+})
+// Random app button
+document.getElementById('btn-random').addEventListener('click', function() {
+  if (!allApps.length) return
+  const app = allApps[Math.floor(Math.random() * allApps.length)]
+  openModal(app.id)
 })
 // category selection handled by cat-pills (setCat)
 document.querySelectorAll('.view-btn').forEach(btn => {
@@ -2585,13 +2793,6 @@ function animateIn (root) {
     if (seen.has(el)) return; seen.add(el)
     animate(el, { opacity: [0,1], x: [-12,0] },
       { delay: i * 0.028, duration: 0.24, easing: EASE_OUT })
-  })
-
-  // Table rows — staggered fade-slide
-  root.querySelectorAll('table.table-view tbody tr').forEach((el, i) => {
-    if (seen.has(el)) return; seen.add(el)
-    animate(el, { opacity: [0,1], y: [8,0] },
-      { delay: i * 0.022, duration: 0.22, easing: EASE_OUT })
   })
 
   // Kanban columns — staggered y-rise
