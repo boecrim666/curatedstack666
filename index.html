@@ -304,6 +304,71 @@
     [data-theme="terminal"] .search-clear:hover { color: #00ff41 !important; background: rgba(0,255,65,0.1) !important; }
     [data-theme="win95"] .search-clear { color: #808080 !important; right: 4px; }
 
+    /* ── Spirit Level (mobile only) ─────────────────── */
+    #level-track {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 55%; height: 1px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 1px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .motion-active #level-track { opacity: 1; }
+    [data-theme="light"] .motion-active #level-track { background: rgba(0,0,0,0.15); }
+
+    #level-bubble {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      border: 1.5px solid rgba(255,255,255,0.55);
+      transform: translate(-50%, -50%) translateX(0px);
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 0.08s ease-out, background 0.25s, border-color 0.25s, box-shadow 0.25s, opacity 0.3s;
+      z-index: 2;
+    }
+    .motion-active #level-bubble { opacity: 1; }
+    #level-bubble.is-level {
+      background: #10b981;
+      border-color: #10b981;
+      box-shadow: 0 0 8px rgba(16,185,129,0.7);
+    }
+    [data-theme="light"] #level-bubble {
+      background: rgba(0,0,0,0.2);
+      border-color: rgba(0,0,0,0.35);
+    }
+    [data-theme="light"] #level-bubble.is-level {
+      background: #10b981; border-color: #10b981;
+    }
+
+    /* Motion toggle button */
+    #motion-toggle {
+      display: none; /* shown only on mobile via media query */
+      align-items: center; justify-content: center;
+      height: 30px; width: 30px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      transition: background var(--trans), color var(--trans), border-color var(--trans);
+      flex-shrink: 0;
+      outline: none;
+    }
+    #motion-toggle.active {
+      background: rgba(16,185,129,0.15);
+      border-color: rgba(16,185,129,0.5);
+      color: #10b981;
+    }
+    #motion-toggle:hover { background: var(--glass-bg-h); }
+
     /* Category dropdown */
     .cat-dropdown-wrap {
       position: relative; flex-shrink: 0;
@@ -1756,6 +1821,9 @@
       .hero { overflow-x: hidden; }
       .app-grid { overflow-x: hidden; }
 
+      /* Motion toggle — show on mobile */
+      #motion-toggle { display: flex !important; }
+
       /* Theme toggle compact */
       .theme-toggle { height: 30px !important; padding: 0 10px !important; font-size: 11px !important; border-radius: 16px !important; }
 
@@ -1874,10 +1942,12 @@
     </a>
     <div class="navbar-search">
       <div class="search-and-filter">
-        <div class="search-wrap">
+        <div class="search-wrap" id="search-wrap">
           <span class="search-icon">⌕</span>
           <input id="search-input" class="search-input" type="text" placeholder="Search apps, tags…" autocomplete="off"/>
           <button class="search-clear" id="search-clear" title="Clear search" style="display:none">✕</button>
+          <div id="level-track"></div>
+          <div id="level-bubble"></div>
         </div>
         <div class="cat-dropdown-wrap" id="cat-dropdown-wrap">
           <button class="cat-dropdown-btn" id="cat-dropdown-btn" type="button">
@@ -1902,6 +1972,7 @@
       <a class="btn-submit-app" id="btn-submit" data-magnetic href="mailto:jarvisclawisopen@gmail.com?subject=Submit%20App%20to%20CuratedStack" title="Submit an app">
         <span>+</span><span>Submit app</span>
       </a>
+      <button id="motion-toggle" title="Spirit Level">⚖️</button>
       <button class="theme-toggle" id="theme-toggle" data-magnetic aria-label="Switch theme">
         <span class="t-icon" id="t-icon">🌙</span>
         <span class="t-label" id="t-label">Dark</span>
@@ -3869,6 +3940,105 @@ function animateCounter (el) {
   }
 
   fetchNews();
+})();
+</script>
+
+<!-- ── Spirit Level / Gyroscope ─────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY   = 'cs_motion_enabled';
+  const LEVEL_THRESH  = 3;   // degrees — within this = "level" (green)
+  const MAX_TILT      = 28;  // degrees — clamp range
+  const MAX_PX        = 42;  // pixels  — max bubble travel each side
+
+  const toggleBtn  = document.getElementById('motion-toggle');
+  const bubble     = document.getElementById('level-bubble');
+  const searchWrap = document.getElementById('search-wrap');
+
+  if (!toggleBtn || !bubble || !searchWrap) return;
+
+  let motionEnabled = localStorage.getItem(STORAGE_KEY) === 'true';
+  let listening     = false;
+
+  /* ── Orientation handler ─────────────────── */
+  function onOrientation (e) {
+    if (!motionEnabled) return;
+    const gamma   = e.gamma || 0; // left-right tilt: -90..90
+    const clamped = Math.max(-MAX_TILT, Math.min(MAX_TILT, gamma));
+    const px      = (clamped / MAX_TILT) * MAX_PX;
+    bubble.style.transform = `translate(calc(-50% + ${px}px), -50%)`;
+    bubble.classList.toggle('is-level', Math.abs(gamma) < LEVEL_THRESH);
+  }
+
+  function startListening () {
+    if (listening) return;
+    window.addEventListener('deviceorientation', onOrientation, { passive: true });
+    listening = true;
+  }
+  function stopListening () {
+    window.removeEventListener('deviceorientation', onOrientation);
+    listening = false;
+    // Reset bubble to center
+    bubble.style.transform = 'translate(-50%, -50%) translateX(0px)';
+    bubble.classList.remove('is-level');
+  }
+
+  /* ── Apply state ─────────────────────────── */
+  function applyState () {
+    searchWrap.classList.toggle('motion-active', motionEnabled);
+    toggleBtn.classList.toggle('active', motionEnabled);
+    if (motionEnabled) startListening();
+    else stopListening();
+  }
+
+  /* ── iOS 13+ permission ──────────────────── */
+  async function requestIOSPermission () {
+    if (
+      typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function'
+    ) {
+      try {
+        const result = await DeviceOrientationEvent.requestPermission();
+        return result === 'granted';
+      } catch (err) {
+        console.warn('[SpiritLevel] Permission error:', err);
+        return false;
+      }
+    }
+    return true; // Android / non-iOS — no permission needed
+  }
+
+  /* ── Toggle click ────────────────────────── */
+  toggleBtn.addEventListener('click', async () => {
+    if (!motionEnabled) {
+      // Turning ON — request permission first if needed
+      const granted = await requestIOSPermission();
+      if (!granted) return; // user denied — stay off
+      motionEnabled = true;
+    } else {
+      motionEnabled = false;
+    }
+    localStorage.setItem(STORAGE_KEY, motionEnabled ? 'true' : 'false');
+    applyState();
+  });
+
+  /* ── Init ────────────────────────────────── */
+  // On iOS, if previously enabled we still need a fresh permission grant
+  // (it's per-session). Re-request silently on load if saved as enabled.
+  if (motionEnabled) {
+    requestIOSPermission().then(granted => {
+      if (!granted) {
+        motionEnabled = false;
+        localStorage.setItem(STORAGE_KEY, 'false');
+      }
+      applyState();
+    });
+  } else {
+    applyState();
+  }
+
 })();
 </script>
 </body>
