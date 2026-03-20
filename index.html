@@ -3257,6 +3257,35 @@ function animateCounter (el) {
      NEWS PANEL — Daily Brief
 ═══════════════════════════════════════════ -->
 <style>
+  /* News Lang Toggle */
+  #news-lang-toggle {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  #news-lang-toggle button {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    outline: none;
+    font-family: var(--font);
+    transition: background 0.15s ease, color 0.15s ease;
+    letter-spacing: 0.05em;
+  }
+  #news-lang-toggle button.active {
+    background: rgba(255,255,255,0.15);
+    color: var(--text);
+  }
+
   /* News Panel Toggle Button */
   #news-panel-toggle {
     position: fixed;
@@ -3616,6 +3645,10 @@ function animateCounter (el) {
 <div id="news-panel">
   <div id="news-panel-header">
     <span>Daily Brief</span>
+    <div id="news-lang-toggle">
+      <button id="news-lang-en" class="active">EN</button>
+      <button id="news-lang-sk">SK</button>
+    </div>
     <button id="news-panel-close" title="Zavrieť">✕</button>
     <span id="news-last-updated"></span>
   </div>
@@ -3659,6 +3692,15 @@ function animateCounter (el) {
 
   let allNews       = [];
   let activeFilter  = 'All';
+  let activeLang    = localStorage.getItem('cs_news_lang') || 'en';
+
+  /* ── Slovak language detector ──────────── */
+  // Slovak has unique chars: ľ ĺ ŕ ť ď ň + common diacritics á č é í ó š ú ý ž
+  const SK_PATTERN = /[ľĺŕťďňáčéíóšúýž]/i;
+  function detectLang (item) {
+    const text = (item.title || '') + ' ' + (item.description || '');
+    return SK_PATTERN.test(text) ? 'sk' : 'en';
+  }
 
   const isMobile = () => window.innerWidth < 768;
 
@@ -3686,6 +3728,27 @@ function animateCounter (el) {
   toggleBtn.addEventListener('click', () => setPanelOpen(!isPanelOpen()));
   if (closeBtn) closeBtn.addEventListener('click', () => setPanelOpen(false));
   backdrop.addEventListener('click', () => setPanelOpen(false));
+
+  /* ── Language toggle ───────────────────── */
+  const langEnBtn = document.getElementById('news-lang-en');
+  const langSkBtn = document.getElementById('news-lang-sk');
+
+  function setLang (lang) {
+    activeLang = lang;
+    localStorage.setItem('cs_news_lang', lang);
+    langEnBtn.classList.toggle('active', lang === 'en');
+    langSkBtn.classList.toggle('active', lang === 'sk');
+    renderNews();
+  }
+
+  langEnBtn.addEventListener('click', () => setLang('en'));
+  langSkBtn.addEventListener('click', () => setLang('sk'));
+
+  // Apply saved lang on load
+  if (activeLang === 'sk') {
+    langEnBtn.classList.remove('active');
+    langSkBtn.classList.add('active');
+  }
 
   // Restore on load (desktop only — mobile always starts closed)
   if (!isMobile()) {
@@ -3723,9 +3786,10 @@ function animateCounter (el) {
 
   /* ── Render ──────────────────────────── */
   function renderNews () {
+    const langFiltered = allNews.filter(n => detectLang(n) === activeLang);
     const items = activeFilter === 'All'
-      ? allNews
-      : allNews.filter(n => n.category === activeFilter || (activeFilter === 'Pokemon' && n.category === 'Pokemon'));
+      ? langFiltered
+      : langFiltered.filter(n => n.category === activeFilter || (activeFilter === 'Pokemon' && n.category === 'Pokemon'));
 
     // Group by date label
     const groups = { Today: [], Yesterday: [], 'This Week': [] };
