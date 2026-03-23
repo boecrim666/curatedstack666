@@ -3789,11 +3789,17 @@ function animateCounter (el) {
   let activeLang    = localStorage.getItem('cs_news_lang') || 'en';
 
   /* ── Slovak language detector ──────────── */
-  // Slovak has unique chars: ľ ĺ ŕ ť ď ň + common diacritics á č é í ó š ú ý ž
+  // Detect by TITLE only — description may be SK even for EN articles
   const SK_PATTERN = /[ľĺŕťďňáčéíóšúýž]/i;
   function detectLang (item) {
-    const text = (item.title || '') + ' ' + (item.description || '');
-    return SK_PATTERN.test(text) ? 'sk' : 'en';
+    return SK_PATTERN.test(item.title || '') ? 'sk' : 'en';
+  }
+
+  /* ── Category order ─────────────────────── */
+  const CAT_ORDER = ['AI', 'Crypto', 'Tech', 'Robotika', 'Pokemon', 'Gaming'];
+  function catRank (cat) {
+    const i = CAT_ORDER.indexOf(cat);
+    return i === -1 ? 99 : i;
   }
 
   const isMobile = () => window.innerWidth < 768;
@@ -3883,7 +3889,12 @@ function animateCounter (el) {
 
   /* ── Render ──────────────────────────── */
   function renderNews () {
-    const langFiltered = allNews.filter(n => detectLang(n) === activeLang);
+    // For SK tab: show EN articles too (they have SK description as translation)
+    // For EN tab: show only EN articles (title not containing SK chars)
+    const langFiltered = activeLang === 'sk'
+      ? allNews  // SK shows everything — EN title + SK desc, or pure SK articles
+      : allNews.filter(n => detectLang(n) === 'en');
+
     const items = activeFilter === 'All'
       ? langFiltered
       : langFiltered.filter(n => n.category === activeFilter || (activeFilter === 'Pokemon' && n.category === 'Pokemon'));
@@ -3901,9 +3912,13 @@ function animateCounter (el) {
       return;
     }
 
-    // Sort each group by published_at descending
+    // Sort each group: by category order first, then published_at descending
     for (const grp of Object.values(groups)) {
-      grp.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+      grp.sort((a, b) => {
+        const catDiff = catRank(a.category) - catRank(b.category);
+        if (catDiff !== 0) return catDiff;
+        return new Date(b.published_at) - new Date(a.published_at);
+      });
     }
 
     let html = '';
@@ -3912,14 +3927,20 @@ function animateCounter (el) {
       html += `<div class="news-date-group"><div class="news-date-label">${label}</div>`;
       for (const n of groupItems) {
         const color = CAT_COLORS[n.category] || '#888';
-        const desc  = n.description
+        // SK tab: use title_sk if available, fallback to title
+        // EN tab: always use title
+        const displayTitle = (activeLang === 'sk' && n.title_sk) ? n.title_sk : n.title;
+        // SK tab: show description (which is the SK translation)
+        // EN tab: only show description if it's not SK text
+        const showDesc = n.description && (activeLang === 'sk' || detectLang({ title: n.description }) === 'en');
+        const desc = showDesc
           ? `<div class="news-desc">${escHtml(n.description)}</div>`
           : '';
         html += `
           <div class="news-item">
             <div class="news-dot" style="background:${color}"></div>
             <div class="news-content">
-              <div class="news-title">${escHtml(n.title)}</div>
+              <div class="news-title">${escHtml(displayTitle)}</div>
               ${desc}
               <div class="news-meta">
                 <span class="news-source">${escHtml(n.source_name || '')}</span>
