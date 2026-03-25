@@ -548,6 +548,90 @@
     #back-to-top:hover { background: var(--glass-bg-h); color: var(--text); transform: translateY(-2px); }
     [data-theme="win95"] #back-to-top { border-radius: 0; border: 2px solid; border-color: #fff #808080 #808080 #fff; background: #c0c0c0; color: #000; box-shadow: none; }
 
+    /* ── Win95: Category pills ── */
+    [data-theme="win95"] .cat-pill {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      color: #000 !important; font-family: Arial, sans-serif !important;
+      box-shadow: none !important; backdrop-filter: none !important;
+    }
+    [data-theme="win95"] .cat-pill:hover { background: #d0d0d0 !important; }
+    [data-theme="win95"] .cat-pill.active {
+      background: navy !important; color: #fff !important;
+      border-color: #808080 #fff #fff #808080 !important;
+    }
+    [data-theme="win95"] .cat-pill .cat-count {
+      background: #fff !important; color: #000 !important; border-radius: 0 !important;
+      border: 1px solid #808080 !important;
+    }
+    [data-theme="win95"] .cat-pill.active .cat-count { background: #c0c0c0 !important; color: #000 !important; }
+
+    /* ── Win95: View buttons hover ── */
+    [data-theme="win95"] .view-btn { background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important; border-color: #fff #808080 #808080 #fff !important; }
+    [data-theme="win95"] .view-btn:hover { background: #d0d0d0 !important; color: #000 !important; }
+    [data-theme="win95"] .view-btn.active { background: navy !important; color: #fff !important; border-color: #808080 #fff #fff #808080 !important; }
+
+    /* ── Win95: List view ── */
+    [data-theme="win95"] .list-row {
+      background: #f0f0f0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
+    }
+    [data-theme="win95"] .list-row:hover { background: #e0e0e0 !important; border-color: #fff #808080 #808080 #fff !important; box-shadow: none !important; }
+    [data-theme="win95"] .list-name { color: #000 !important; }
+    [data-theme="win95"] .list-sub { color: #444 !important; }
+    [data-theme="win95"] .list-cat {
+      background: navy !important; color: #fff !important;
+      border-radius: 0 !important; border: 1px solid #00008b !important;
+    }
+    [data-theme="win95"] .list-upvotes { color: #444 !important; }
+
+    /* ── Win95: Kanban ── */
+    [data-theme="win95"] .kanban-col {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    [data-theme="win95"] .kanban-col-header {
+      background: navy !important; color: #fff !important;
+      border-radius: 0 !important; border-bottom: 2px solid #808080 !important;
+    }
+    [data-theme="win95"] .kanban-col-title { color: #fff !important; }
+    [data-theme="win95"] .kanban-col-count { background: #c0c0c0 !important; color: #000 !important; border-radius: 0 !important; }
+    [data-theme="win95"] .kanban-card {
+      background: #f0f0f0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      backdrop-filter: none !important; box-shadow: none !important;
+    }
+    [data-theme="win95"] .kanban-card:hover { background: #e8e8e8 !important; transform: none !important; box-shadow: none !important; }
+    [data-theme="win95"] .kanban-card-name { color: #000 !important; }
+    [data-theme="win95"] .kanban-card-desc { color: #444 !important; }
+    [data-theme="win95"] .kanban-card-footer { color: #444 !important; }
+
+    /* ── Win95: Timeline ── */
+    [data-theme="win95"] .timeline-card {
+      background: #f0f0f0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important;
+    }
+    [data-theme="win95"] .timeline-card:hover { background: #e8e8e8 !important; box-shadow: none !important; border-color: #fff #808080 #808080 #fff !important; }
+    [data-theme="win95"] .timeline-card-name { color: #000 !important; }
+    [data-theme="win95"] .timeline-card-cat { color: navy !important; }
+    [data-theme="win95"] .timeline-card-desc { color: #444 !important; }
+    [data-theme="win95"] .timeline-month-label { color: #000080 !important; letter-spacing: 0 !important; }
+    [data-theme="win95"] .timeline-dot { background: navy !important; box-shadow: none !important; border-radius: 0 !important; width: 10px !important; height: 10px !important; }
+    [data-theme="win95"] .timeline-bar { background: #808080 !important; }
+
+    /* ── Win95: Section / category header ── */
+    [data-theme="win95"] .section-header { color: #000 !important; font-family: Arial, sans-serif !important; }
+    [data-theme="win95"] .section-divider { background: #808080 !important; }
+
+    /* ── Win95: Tags in list/kanban/timeline ── */
+    [data-theme="win95"] .tag:not(.pricing) {
+      background: #e0e0e0 !important; color: #000 !important;
+      border-radius: 0 !important; border: 1px solid #808080 !important;
+    }
+
     /* ══════════════════════════════════════════
        WRAPPER
     ══════════════════════════════════════════ */
