@@ -1434,6 +1434,57 @@
     .lb-upvote-btn.upvoted { background: rgba(var(--accent-rgb),0.18); border-color: rgba(var(--accent-rgb),0.60); color: var(--accent); }
     [data-theme="terminal"] .leaderboard-row { border-radius: 4px !important; }
     [data-theme="terminal"] .leaderboard-header h2 { -webkit-text-fill-color: #00ff41 !important; text-shadow: 0 0 14px rgba(0,255,65,0.5) !important; }
+
+    /* ── Win95: Leaderboard ── */
+    [data-theme="win95"] .leaderboard-wrap {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      backdrop-filter: none !important;
+    }
+    [data-theme="win95"] .leaderboard-header {
+      background: navy !important; border-radius: 0 !important;
+      border-bottom: 2px solid #808080 !important; padding: 8px 16px !important;
+      border: none !important;
+    }
+    [data-theme="win95"] .leaderboard-header h2 {
+      background: none !important; -webkit-background-clip: unset !important;
+      -webkit-text-fill-color: #fff !important; background-clip: unset !important;
+      color: #fff !important; font-family: Arial, sans-serif !important;
+      font-size: 14px !important; letter-spacing: 0 !important;
+      text-shadow: none !important;
+    }
+    [data-theme="win95"] .leaderboard-header p { color: rgba(255,255,255,0.85) !important; }
+    [data-theme="win95"] .leaderboard-row {
+      background: #f0f0f0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+    }
+    [data-theme="win95"] .leaderboard-row::before { display: none !important; }
+    [data-theme="win95"] .leaderboard-row:hover { background: #e0e0e0 !important; box-shadow: none !important; }
+    [data-theme="win95"] .leaderboard-row.top-1 { background: #fffde0 !important; border-color: #c8a000 #808080 #808080 #c8a000 !important; }
+    [data-theme="win95"] .leaderboard-row.top-2 { background: #f0f0f0 !important; }
+    [data-theme="win95"] .leaderboard-row.top-3 { background: #f5ede0 !important; }
+    [data-theme="win95"] .lb-rank { color: #000 !important; text-shadow: none !important; font-family: Arial, sans-serif !important; }
+    [data-theme="win95"] .leaderboard-row.top-1 .lb-rank { color: #806000 !important; font-size: 18px !important; }
+    [data-theme="win95"] .leaderboard-row.top-2 .lb-rank { color: #505050 !important; font-size: 18px !important; }
+    [data-theme="win95"] .leaderboard-row.top-3 .lb-rank { color: #7a4a00 !important; font-size: 18px !important; }
+    [data-theme="win95"] .lb-icon { border-radius: 0 !important; border: 1px solid #808080 !important; }
+    [data-theme="win95"] .lb-name { color: #000 !important; font-family: Arial, sans-serif !important; }
+    [data-theme="win95"] .lb-cat { color: navy !important; }
+    [data-theme="win95"] .lb-votes {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #808080 #fff #fff #808080 !important; border-radius: 0 !important;
+    }
+    [data-theme="win95"] .lb-votes-arrow { color: navy !important; font-size: 14px !important; }
+    [data-theme="win95"] .lb-votes-num { color: #000 !important; }
+    [data-theme="win95"] .lb-upvote-btn {
+      background: #c0c0c0 !important; border: 2px solid !important;
+      border-color: #fff #808080 #808080 #fff !important; border-radius: 0 !important;
+      color: #000 !important; font-family: Arial, sans-serif !important;
+    }
+    [data-theme="win95"] .lb-upvote-btn:hover { background: #d0d0d0 !important; }
+    [data-theme="win95"] .lb-upvote-btn.upvoted { background: navy !important; color: #fff !important; border-color: #808080 #fff #fff #808080 !important; }
     @media (max-width: 600px) {
       .leaderboard-row { grid-template-columns: 36px 36px 1fr auto; }
       .lb-upvote-btn { display: none; }
