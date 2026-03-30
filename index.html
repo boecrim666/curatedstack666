@@ -3701,12 +3701,33 @@ function animateCounter (el) {
     font-size: 11px;
     color: var(--text-muted);
     line-height: 1.4;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  .news-item.expanded .news-desc {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  .news-expand-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 3px;
+    line-height: 1;
+    display: block;
+    font-family: var(--font);
+    transition: color 0.15s;
+  }
+  .news-expand-btn:hover { color: var(--text-muted); }
+  .news-item { cursor: pointer; }
+  .news-item.expanded .news-expand-btn { color: var(--accent); }
   .news-meta {
     display: flex;
     align-items: center;
@@ -3937,10 +3958,16 @@ function animateCounter (el) {
   let activeLang    = localStorage.getItem('cs_news_lang') || 'en';
 
   /* ── Slovak language detector ──────────── */
-  // Only true Slovak-specific characters (NOT é which appears in Pokémon/English)
-  const SK_PATTERN = /[ľĺŕťďňčšžýáíóúäô]/i;
+  // Unambiguously Slovak chars: ľ ĺ ŕ ť ď ň š č ž ý á í ó ú ä ô
+  // Excluded: é (Pokémon), è, ê, à (French loanwords in English)
+  const SK_PATTERN = /[ľĺŕťďňšžýáíóúäô]/i;
   function detectLang (item) {
-    return SK_PATTERN.test(item.title || '') ? 'sk' : 'en';
+    // also check 'č' but only if title has other SK chars too (avoids false positives)
+    const t = item.title || '';
+    if (SK_PATTERN.test(t)) return 'sk';
+    // 'č' alone: only flag if word context suggests SK (e.g. "č" followed by typical SK endings)
+    if (/č[íúáa]|dní|nás|tých|ných|ého|nej|ove|ula|uje|ajú|ajú/i.test(t)) return 'sk';
+    return 'en';
   }
 
   /* ── Category order ─────────────────────── */
@@ -4037,15 +4064,13 @@ function animateCounter (el) {
 
   /* ── Render ──────────────────────────── */
   function renderNews () {
-    // For SK tab: show EN articles too (they have SK description as translation)
-    // For EN tab: show only EN articles (title not containing SK chars)
-    const langFiltered = activeLang === 'sk'
-      ? allNews  // SK shows everything — EN title + SK desc, or pure SK articles
-      : allNews.filter(n => detectLang(n) === 'en');
+    // EN tab: only EN articles (title has no SK-specific chars)
+    // SK tab: only SK articles (title has SK-specific chars)
+    const langFiltered = allNews.filter(n => detectLang(n) === activeLang);
 
     const items = activeFilter === 'All'
       ? langFiltered
-      : langFiltered.filter(n => n.category === activeFilter || (activeFilter === 'Pokemon' && n.category === 'Pokemon'));
+      : langFiltered.filter(n => n.category === activeFilter);
 
     // Group by date label
     const groups = { Today: [], Yesterday: [], 'This Week': [] };
@@ -4056,7 +4081,7 @@ function animateCounter (el) {
 
     const hasAny = Object.values(groups).some(g => g.length > 0);
     if (!hasAny) {
-      feed.innerHTML = '<div class="news-empty">No news found.</div>';
+      feed.innerHTML = `<div class="news-empty">${activeLang === 'sk' ? 'Žiadne správy.' : 'No news found.'}</div>`;
       return;
     }
 
@@ -4075,19 +4100,14 @@ function animateCounter (el) {
       html += `<div class="news-date-group"><div class="news-date-label">${label}</div>`;
       for (const n of groupItems) {
         const color = CAT_COLORS[n.category] || '#888';
-        // title_sk column does not exist — always use title (EN)
-        const displayTitle = n.title;
-        // SK tab: show description always (may contain SK translation)
-        // EN tab: show description only if it doesn't contain SK-specific chars
-        const showDesc = n.description && (activeLang === 'sk' || detectLang({ title: n.description }) === 'en');
-        const desc = showDesc
-          ? `<div class="news-desc">${escHtml(n.description)}</div>`
+        const desc = n.description
+          ? `<div class="news-desc">${escHtml(n.description)}</div><button class="news-expand-btn" aria-label="Expand">▾</button>`
           : '';
         html += `
           <div class="news-item">
             <div class="news-dot" style="background:${color}"></div>
             <div class="news-content">
-              <div class="news-title">${escHtml(displayTitle)}</div>
+              <div class="news-title">${escHtml(n.title)}</div>
               ${desc}
               <div class="news-meta">
                 <span class="news-source">${escHtml(n.source_name || '')}</span>
@@ -4099,6 +4119,16 @@ function animateCounter (el) {
       html += '</div>';
     }
     feed.innerHTML = html;
+
+    // Expand/collapse descriptions on click
+    feed.querySelectorAll('.news-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.news-link')) return; // don't block link clicks
+        item.classList.toggle('expanded');
+        const btn = item.querySelector('.news-expand-btn');
+        if (btn) btn.textContent = item.classList.contains('expanded') ? '▴' : '▾';
+      });
+    });
   }
 
   function escHtml (str) {
