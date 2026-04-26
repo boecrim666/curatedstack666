@@ -7,6 +7,7 @@
 
 -- ---------- Extensions ----------
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS citext;
 
 -- ---------- Roles enum ----------
 DO $$ BEGIN
@@ -35,9 +36,6 @@ CREATE TABLE IF NOT EXISTS profiles (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
--- citext for case-insensitive unique username
-CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 
