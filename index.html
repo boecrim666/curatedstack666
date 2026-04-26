@@ -2784,7 +2784,7 @@ function renderTimelineView(filtered) {
             <div class="timeline-dot"></div>
             <div class="timeline-bar"></div>
           </div>
-          <div class="timeline-card" onclick="openModal('${app.id}')">
+          <div class="timeline-card" data-id="${app.id}" onclick="openModal('${app.id}')">
             <div class="timeline-card-top">
               <img class="timeline-card-icon" src="${favicon}" alt="${app.name}" onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}">
               <div>
@@ -2818,7 +2818,7 @@ function renderLeaderboardView(apps) {
     const favicon = app.logo_url || getFavicon(app.url)
     const hasUpvoted = hasVotedFor(app.id)
     return `
-      <div class="leaderboard-row ${topClass(i)}" onclick="openModal('${app.id}')">
+      <div class="leaderboard-row ${topClass(i)}" data-id="${app.id}" onclick="openModal('${app.id}')">
         <div class="lb-rank">${medal(i)}</div>
         <img class="lb-icon" src="${favicon}" alt="${app.name}" onerror="if(!this.dataset.err){this.dataset.err='1';this.src='logo.svg'}">
         <div class="lb-info">
