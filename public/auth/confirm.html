@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Signing you in… — CuratedStack</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+    }
+    .card {
+      max-width: 480px;
+      padding: 40px 32px;
+      text-align: center;
+      background: #1a1a1a;
+      border-radius: 16px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+    }
+    h1 { margin: 0 0 12px; font-size: 22px; }
+    p  { margin: 8px 0; opacity: 0.8; line-height: 1.5; }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #fff;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .err {
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner" id="spinner"></div>
+    <h1 id="title">Signing you in…</h1>
+    <p id="subtitle">Please wait, this should only take a moment.</p>
+    <div id="error-box" style="display:none"></div>
+    <a href="/" id="back-btn" style="display:none">Back to CuratedStack</a>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
+
+    const SUPABASE_URL = 'https://jereytrwxnuwcvzvqhbg.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Ja352XgtGhInP4xHMhVB7Q_wuouZohQ';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        flowType: 'pkce',
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        storage: window.localStorage,
+        storageKey: 'sb-jereytrwxnuwcvzvqhbg-auth-token',
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const token_hash = params.get('token_hash');
+    const type = params.get('type') || 'email';
+    const next = params.get('next') || '/';
+
+    function showError(msg) {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('title').textContent = 'Sign-in failed';
+      document.getElementById('subtitle').textContent = '';
+      const box = document.getElementById('error-box');
+      box.className = 'err';
+      box.style.display = 'block';
+      box.textContent = msg;
+      document.getElementById('back-btn').style.display = 'inline-block';
+    }
+
+    if (!token_hash) {
+      showError('Missing token. Please request a new magic link.');
+    } else {
+      // verifyOtp consumes the token here, in the browser, only when the user
+      // really clicks the link — email prefetchers cannot trigger it because
+      // they only GET this static HTML, they do not run JavaScript.
+      supabase.auth.verifyOtp({ token_hash, type })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('[CSAuth] verifyOtp error', error);
+            showError(error.message || 'The link is invalid or has expired. Please request a new one.');
+            return;
+          }
+          console.log('[CSAuth] signed in via PKCE token_hash, redirecting to', next);
+          // Session is now persisted in localStorage. Navigate to the app.
+          window.location.replace(next);
+        })
+        .catch(e => {
+          console.error('[CSAuth] verifyOtp exception', e);
+          showError('Unexpected error: ' + (e.message || e));
+        });
+    }
+  </script>
+</body>
+</html>
