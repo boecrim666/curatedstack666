@@ -15,12 +15,18 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL      = 'https://jereytrwxnuwcvzvqhbg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ja352XgtGhInP4xHMhVB7Q_wuouZohQ';
 
+// NOTE: implicit flow on purpose — PKCE for magic link breaks when the email is
+// opened in a different browser context (Apple Mail Privacy Relay, Gmail app,
+// mobile vs desktop) because the code_verifier saved in localStorage at
+// sign-in time is not available where the link is clicked.  Implicit flow
+// uses a server-validated token_hash that does NOT need a verifier — see
+// https://www.reddit.com/r/Supabase/comments/1i8kyx3/ (Supabase staff reply).
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken:    true,
     persistSession:      true,
     detectSessionInUrl:  true,
-    flowType:            'pkce',
+    flowType:            'implicit',
     storage:             window.localStorage,
     storageKey:          'sb-jereytrwxnuwcvzvqhbg-auth-token',
   },

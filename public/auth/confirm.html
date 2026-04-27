@@ -72,9 +72,12 @@
     const SUPABASE_URL = 'https://jereytrwxnuwcvzvqhbg.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Ja352XgtGhInP4xHMhVB7Q_wuouZohQ';
 
+    // Implicit flow on purpose — token_hash from email can be redeemed without
+    // a PKCE code_verifier, so this works even if the user clicks the link in
+    // a different browser than the one that requested it.
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
-        flowType: 'pkce',
+        flowType: 'implicit',
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false,
