@@ -79,6 +79,31 @@ async function syncFromSession(session, source = '?') {
 // instead of also racing with a manual getSession() call — which used to cause
 // AbortError when the two ran concurrently.
 // ---------------------------------------------------------------------------
+// Surface auth errors that come back in the URL hash (e.g. otp_expired,
+// access_denied) so the user is not left wondering why nothing happened.
+(function showAuthErrorIfPresent() {
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+  const m = hash.match(/[#&]error_code=([^&]+)/) || search.match(/[?&]error_code=([^&]+)/);
+  const desc = (hash.match(/[#&]error_description=([^&]+)/) || search.match(/[?&]error_description=([^&]+)/) || [])[1];
+  if (m) {
+    const code = decodeURIComponent(m[1]);
+    const description = decodeURIComponent(desc || code).replace(/\+/g, ' ');
+    console.warn('[CSAuth] auth error from URL:', code, description);
+    // Show a banner the user can dismiss
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.id = 'cs-auth-error-banner';
+      banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#ff3b30;color:#fff;padding:14px 20px;border-radius:8px;font-family:system-ui,sans-serif;font-size:14px;max-width:520px;z-index:99999;box-shadow:0 6px 24px rgba(0,0,0,0.3);cursor:pointer;line-height:1.4;';
+      banner.innerHTML = `<b>Sign-in failed:</b> ${description}<br><span style="font-size:12px;opacity:0.85">Click to dismiss — then request a new magic link and click it within a few minutes.</span>`;
+      banner.onclick = () => banner.remove();
+      document.body.appendChild(banner);
+      // Clean URL so refresh does not re-show
+      window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+    }, 800);
+  }
+})();
+
 supabase.auth.onAuthStateChange(async (event, session) => {
   console.log('[CSAuth] onAuthStateChange →', event, '| has session:', !!session);
   await syncFromSession(session, 'onAuthStateChange[' + event + ']');
