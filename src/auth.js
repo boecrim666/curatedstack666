@@ -1,68 +1,56 @@
-/**
- * CuratedStack — Auth module
- * --------------------------------------------------------------
- * Wraps Supabase auth: magic link, OAuth (Google, GitHub, Twitter,
- * Apple), session, and current user/profile/role state.
- *
- * Exposes window.CSAuth for use from index.html.
- */
-
+// ---------------------------------------------------------------------------
+// CuratedStack — Supabase auth helper
+//
+// Implicit flow magic link.  The flow is:
+//   1. user enters email → signInWithOtp() sends magic link
+//   2. user clicks link in email → Supabase verifies the token and redirects
+//      back to the site with #access_token=...&refresh_token=...&type=magiclink
+//   3. supabase-js detects the hash automatically (detectSessionInUrl: true),
+//      stores the session in localStorage under sb-<ref>-auth-token,
+//      fires onAuthStateChange('SIGNED_IN').
+//   4. We then strip the hash from the URL so refreshes do not re-trigger it.
+// ---------------------------------------------------------------------------
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://jereytrwxnuwcvzvqhbg.supabase.co';
+const SUPABASE_URL      = 'https://jereytrwxnuwcvzvqhbg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ja352XgtGhInP4xHMhVB7Q_wuouZohQ';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'implicit',
+    autoRefreshToken:    true,
+    persistSession:      true,
+    detectSessionInUrl:  true,
+    flowType:            'implicit',
+    storage:             window.localStorage,
+    storageKey:          'sb-jereytrwxnuwcvzvqhbg-auth-token',
   },
 });
 
-// Debug: log every auth event so the user can diagnose magic-link issues
-// from DevTools.
-const _origGetSession = supabase.auth.getSession.bind(supabase.auth);
-supabase.auth.getSession = async function () {
-  const r = await _origGetSession();
-  console.log('[CSAuth] getSession ->', !!r?.data?.session, r?.error?.message || '');
-  return r;
-};
-
-// ------------------------------------------------------------------
-// State
-// ------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// State + listeners
+// ---------------------------------------------------------------------------
 const state = {
-  session: null,
-  user: null,
-  profile: null,
-  loading: true,
+  session:  null,
+  user:     null,
+  profile:  null,
+  loading:  true,
 };
-
 const listeners = new Set();
-function emit() { for (const l of listeners) l(getState()); }
+const emit = () => listeners.forEach(fn => { try { fn(state); } catch(e) { console.error(e); } });
 
-export function getState() {
-  return {
-    session:  state.session,
-    user:     state.user,
-    profile:  state.profile,
-    isLoggedIn: !!state.user,
-    isAdmin:  state.profile?.role === 'admin',
-    loading:  state.loading,
-  };
-}
-
+export function getState()       { return state; }
+export function isLoggedIn()     { return !!state.user; }
+export function isAdmin()        { return state.profile?.role === 'admin'; }
 export function onAuthChange(fn) {
   listeners.add(fn);
-  fn(getState());
+  // fire immediately with current state so the UI doesn't have to wait
+  try { fn(state); } catch(e) { console.error(e); }
   return () => listeners.delete(fn);
 }
 
-// ------------------------------------------------------------------
-// Bootstrap
-// ------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Profile loading
+// ---------------------------------------------------------------------------
 async function loadProfile(userId) {
   if (!userId) return null;
   const { data, error } = await supabase
@@ -70,110 +58,107 @@ async function loadProfile(userId) {
     .select('*')
     .eq('id', userId)
     .maybeSingle();
-  if (error) console.warn('loadProfile error:', error.message);
+  if (error) console.warn('[CSAuth] loadProfile error:', error.message);
   return data || null;
 }
 
-async function refresh() {
-  const { data: { session } } = await supabase.auth.getSession();
+async function syncFromSession(session, source = '?') {
   state.session = session;
   state.user    = session?.user ?? null;
   state.profile = state.user ? await loadProfile(state.user.id) : null;
   state.loading = false;
+  console.log('[CSAuth]', source, '→ user:', state.user?.email || 'null', '| role:', state.profile?.role || 'none');
   emit();
 }
 
-// Kick off initial session load (no top-level await for browser-target build)
-refresh();
-
+// ---------------------------------------------------------------------------
+// Bootstrap
+//
+// supabase-js v2 fires INITIAL_SESSION on its own once it has finished parsing
+// the URL hash (or restored a persisted session).  We rely on that exclusively
+// instead of also racing with a manual getSession() call — which used to cause
+// AbortError when the two ran concurrently.
+// ---------------------------------------------------------------------------
 supabase.auth.onAuthStateChange(async (event, session) => {
-  console.log('[CSAuth] onAuthStateChange ->', event, !!session);
-  state.session = session;
-  state.user    = session?.user ?? null;
-  state.profile = state.user ? await loadProfile(state.user.id) : null;
-  state.loading = false;
-  emit();
+  console.log('[CSAuth] onAuthStateChange →', event, '| has session:', !!session);
+  await syncFromSession(session, 'onAuthStateChange[' + event + ']');
 
-  // Clean magic-link / OAuth params from the URL so they don't get reused
-  if (event === 'SIGNED_IN' && (window.location.hash || window.location.search.includes('code='))) {
+  // Strip auth params from the URL only after the session is safely persisted
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') &&
+      (window.location.hash.includes('access_token=') ||
+       window.location.search.includes('code='))) {
     const cleanUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
+    console.log('[CSAuth] cleaned auth params from URL');
   }
 });
 
-// ------------------------------------------------------------------
-// Sign in
-// ------------------------------------------------------------------
+// Safety net: in case onAuthStateChange does not fire INITIAL_SESSION quickly
+// (rare), fall back to an explicit getSession() after a short delay so the UI
+// is never left in a "loading" state.
+setTimeout(async () => {
+  if (state.loading) {
+    const { data: { session } } = await supabase.auth.getSession();
+    await syncFromSession(session, 'fallback-getSession');
+  }
+}, 1500);
+
+// ---------------------------------------------------------------------------
+// Sign-in helpers
+// ---------------------------------------------------------------------------
 const REDIRECT_TO = `${window.location.origin}${window.location.pathname}`;
 
-/**
- * Send magic link to e-mail.
- * @param {string} email
- * @param {boolean} marketingConsent — store in user_metadata so the
- *   handle_new_user trigger picks it up on first sign-in.
- */
 export async function signInWithMagicLink(email, marketingConsent = false) {
+  if (marketingConsent) localStorage.setItem('cs_pending_marketing_consent', '1');
   const { error } = await supabase.auth.signInWithOtp({
-    email: email.trim(),
-    options: {
-      emailRedirectTo: REDIRECT_TO,
-      data: { marketing_consent: !!marketingConsent },
-    },
+    email,
+    options: { emailRedirectTo: REDIRECT_TO, shouldCreateUser: true },
   });
   if (error) throw error;
-  return { ok: true };
 }
 
-const PROVIDER_MAP = {
-  google:  'google',
-  github:  'github',
-  twitter: 'twitter',
-  apple:   'apple',
-};
-
-export async function signInWithProvider(providerKey, marketingConsent = false) {
-  const provider = PROVIDER_MAP[providerKey];
-  if (!provider) throw new Error(`Unknown provider: ${providerKey}`);
-
-  // Stash consent in localStorage so we can patch the profile after
-  // the OAuth round-trip (user_metadata can't carry custom fields
-  // through every provider).
-  if (marketingConsent) {
-    localStorage.setItem('cs_pending_marketing_consent', '1');
-  }
-
+export async function signInWithOAuth(provider) {
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: { redirectTo: REDIRECT_TO },
   });
   if (error) throw error;
 }
+// Back-compat alias used elsewhere in the codebase
+export const signInWithProvider = signInWithOAuth;
 
 export async function signOut() {
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
 }
 
-// After OAuth redirect, persist the consent the user opted into.
+// ---------------------------------------------------------------------------
+// Pending marketing consent (set during sign-in, applied after profile loads)
+// ---------------------------------------------------------------------------
 onAuthChange(async ({ user, profile }) => {
   if (!user || !profile) return;
   const pending = localStorage.getItem('cs_pending_marketing_consent');
-  if (pending === '1' && !profile.marketing_consent) {
-    await supabase.from('profiles').update({
-      marketing_consent: true,
-      marketing_consent_at: new Date().toISOString(),
-    }).eq('id', user.id);
-    localStorage.removeItem('cs_pending_marketing_consent');
+  if (pending && !profile.marketing_consent) {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        marketing_consent: true,
+        marketing_consent_at: new Date().toISOString(),
+      })
+      .eq('id', user.id);
+    if (!error) localStorage.removeItem('cs_pending_marketing_consent');
   }
 });
 
-// ------------------------------------------------------------------
-// Public helper for index.html
-// ------------------------------------------------------------------
-window.CSAuth = {
-  supabase,
-  getState,
-  onAuthChange,
-  signInWithMagicLink,
-  signInWithProvider,
-  signOut,
-};
+// Expose a few helpers for debugging from DevTools
+if (typeof window !== 'undefined') {
+  window.__csAuthDebug = {
+    state: () => state,
+    storage: () => localStorage.getItem('sb-jereytrwxnuwcvzvqhbg-auth-token'),
+    forceRefresh: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      await syncFromSession(session, 'manual');
+      return session;
+    },
+  };
+}
