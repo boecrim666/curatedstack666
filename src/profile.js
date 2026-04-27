@@ -19,6 +19,14 @@ export async function updateMyProfile(patch) {
   const { user } = getState();
   if (!user) throw new Error('Not signed in');
 
+  // Verify the auth session is still alive before attempting an UPDATE.
+  // Without an active session, RLS silently drops the update and PostgREST
+  // returns 200 OK with zero rows (no error), making the failure invisible.
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw new Error('Your session has expired. Please sign in again.');
+  }
+
   // Allowed self-edit fields
   const allowed = ['username', 'display_name', 'bio', 'avatar_url',
                    'website_url', 'twitter_url', 'github_url',
@@ -30,14 +38,18 @@ export async function updateMyProfile(patch) {
     safe.marketing_consent_at = safe.marketing_consent ? new Date().toISOString() : null;
   }
 
+  console.log('[CSAuth] updateMyProfile patch:', safe, 'for user', user.id);
+
   const { data, error } = await supabase
     .from('profiles')
     .update(safe)
     .eq('id', user.id)
-    .select()
-    .single();
+    .select();   // returns array, not single — lets us detect 0-row updates
   if (error) throw error;
-  return data;
+  if (!data || data.length === 0) {
+    throw new Error('Profile update affected no rows. Check that you are signed in (RLS may be blocking).');
+  }
+  return data[0];
 }
 
 /**

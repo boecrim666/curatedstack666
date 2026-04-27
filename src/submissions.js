@@ -7,6 +7,10 @@ export async function submitApp(payload) {
   const { user } = getState();
   if (!user) throw new Error('SIGN_IN_REQUIRED');
 
+  // Verify session is still alive (see updateMyProfile for the same pattern)
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Your session has expired. Please sign in again.');
+
   const row = {
     submitter_id:   user.id,
     name:           (payload.name || '').trim(),
